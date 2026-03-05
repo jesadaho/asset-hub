@@ -177,6 +177,12 @@ function fromAdditionalData<T>(additionalData: unknown, ...keys: string[]): T | 
   return null;
 }
 
+function asStringOrNumber(v: unknown): string | number | null {
+  if (v == null) return null;
+  if (typeof v === "string" || typeof v === "number") return v;
+  return null;
+}
+
 function pickDetailUrl(obj: Record<string, unknown>): string | null {
   const keys = [
     "url",
@@ -263,10 +269,11 @@ function mapItem(raw: unknown, index: number): DDPropertyItem {
     imageUrl: pickFirstImage(o),
     price: priceNum,
     priceDisplay: priceDisplay || null,
-    bedrooms: bedrooms != null ? bedrooms : null,
-    bathrooms: bathrooms != null ? bathrooms : null,
-    areaSqm:
+    bedrooms: asStringOrNumber(bedrooms),
+    bathrooms: asStringOrNumber(bathrooms),
+    areaSqm: asStringOrNumber(
       o.areaSqm ?? o.sqm ?? o.area_sqm ?? o.square_meters ?? o.sqft ?? o.size_sqm ?? null,
+    ),
     propertyType:
       typeof o.propertyType === "string"
         ? o.propertyType
