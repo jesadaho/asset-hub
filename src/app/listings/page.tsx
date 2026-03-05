@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
@@ -19,7 +20,7 @@ type ListingItem = {
   imageUrl: string | null;
 };
 
-export default function ListingsPage() {
+function ListingsPageContent() {
   const searchParams = useSearchParams();
   const location = searchParams.get("location") ?? "";
   const listingType = searchParams.get("listingType") ?? "rent";
@@ -167,5 +168,24 @@ export default function ListingsPage() {
         )}
       </main>
     </div>
+  );
+}
+
+function ListingsPageFallback() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <HeaderSimple />
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <p className="text-slate-500">กำลังโหลด...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function ListingsPage() {
+  return (
+    <Suspense fallback={<ListingsPageFallback />}>
+      <ListingsPageContent />
+    </Suspense>
   );
 }
