@@ -266,14 +266,9 @@ function mapItem(raw: unknown, index: number): DDPropertyItem {
     priceDisplay: priceDisplay || null,
     bedrooms: asStringOrNumber(bedrooms),
     bathrooms: asStringOrNumber(bathrooms),
-    areaSqm:
-      o.areaSqm ??
-      o.sqm ??
-      o.area_sqm ??
-      o.square_meters ??
-      o.sqft ??
-      o.size_sqm ??
-      null,
+    areaSqm: asStringOrNumber(
+      o.areaSqm ?? o.sqm ?? o.area_sqm ?? o.square_meters ?? o.sqft ?? o.size_sqm ?? null,
+    ),
     propertyType:
       typeof o.propertyType === "string"
         ? o.propertyType
