@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, ChevronLeft } from "lucide-react";
+import { Search, ChevronLeft, Home } from "lucide-react";
 import { Header } from "@/components/Header";
 import { HeaderSimple } from "@/components/HeaderSimple";
 
