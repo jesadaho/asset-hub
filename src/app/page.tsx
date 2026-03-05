@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { Header } from "@/components/Header";
 import { SearchFilterBar } from "@/components/SearchFilterBar";
 import { NewToMarketSection } from "@/components/NewToMarketSection";
@@ -7,9 +8,9 @@ import { NewToMarketSection } from "@/components/NewToMarketSection";
 const LINE_PORJAI_URL = "https://line.me/ti/p/~@porjai_asset";
 const PRIMARY = "#068e7b";
 
-export default function HomePage() {
+function HomePageContent() {
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <Header />
 
       {/* Hero + Search: gradient ตาม reference (ฟ้าอ่อนบน → มิ้นท์ล่าง) + ดาวมุมขวาล่าง */}
@@ -78,6 +79,32 @@ export default function HomePage() {
       </div>
 
       <NewToMarketSection />
+    </>
+  );
+}
+
+function HomePageFallback() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Header />
+      <section
+        className="relative flex min-h-[320px] flex-col items-center justify-center px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14"
+        style={{
+          background: "linear-gradient(180deg, #f0f9f8 0%, #e0f2ef 40%, #ccece6 100%)",
+        }}
+      >
+        <p className="text-slate-500">กำลังโหลด...</p>
+      </section>
+    </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Suspense fallback={<HomePageFallback />}>
+        <HomePageContent />
+      </Suspense>
     </div>
   );
 }
