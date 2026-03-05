@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
     Math.max(limitParam ? parseInt(limitParam, 10) : DEFAULT_LIMIT, 1),
     MAX_LIMIT
   );
+  const pageParam = searchParams.get("page");
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 0;
   const cursor = searchParams.get("cursor")?.trim() ?? undefined;
 
   const minPriceNum =
@@ -59,7 +61,8 @@ export async function GET(request: NextRequest) {
       filter.price = priceCond;
     }
 
-    if (cursor) {
+    const usePage = page >= 1;
+    if (!usePage && cursor) {
       const parts = cursor.split("_");
       const createdAtMs = parts[0] ? parseInt(parts[0], 10) : NaN;
       const cursorId = parts.slice(1).join("_");
@@ -79,13 +82,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const skip = usePage ? (page - 1) * limit : 0;
+    const totalCount = usePage ? await Property.countDocuments(filter) : 0;
+    const totalPages = usePage ? Math.ceil(totalCount / limit) : 0;
+
     const docs = await Property.find(filter)
       .sort({ createdAt: -1, _id: -1 })
-      .limit(limit + 1)
+      .skip(skip)
+      .limit(usePage ? limit : limit + 1)
       .lean();
 
-    const hasMore = docs.length > limit;
-    const items = hasMore ? docs.slice(0, limit) : docs;
+    const hasMore = usePage ? page < totalPages : docs.length > limit;
+    const items = usePage ? docs : hasMore ? docs.slice(0, limit) : docs;
 
     const listings = await Promise.all(
       items.map(async (doc) => {
@@ -117,7 +125,7 @@ export async function GET(request: NextRequest) {
     );
 
     let nextCursor: string | null = null;
-    if (hasMore && items.length > 0) {
+    if (hasMore && items.length > 0 && !usePage) {
       const last = items[items.length - 1] as { createdAt: Date; _id: mongoose.Types.ObjectId };
       nextCursor = `${last.createdAt.getTime()}_${last._id.toString()}`;
     }
@@ -125,6 +133,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       listings,
       nextCursor,
+      ...(usePage && { totalCount, totalPages }),
     });
   } catch (err) {
     console.error("[GET /api/listings]", err);

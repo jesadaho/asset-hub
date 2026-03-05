@@ -153,7 +153,7 @@ export default function ListingDetailPage() {
           <article className="min-w-0">
             {/* Gallery */}
             <div className="flex gap-2">
-              <div className="relative flex-1 aspect-[16/10] min-h-[240px] overflow-hidden rounded-xl bg-slate-200">
+              <div className="relative flex-1 aspect-[3/2] min-h-[240px] overflow-hidden rounded-xl bg-slate-200">
                 {mainImageUrl ? (
                   <img
                     src={mainImageUrl}

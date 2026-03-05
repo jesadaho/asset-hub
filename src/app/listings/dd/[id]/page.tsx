@@ -135,7 +135,7 @@ export default function DDListingDetailPage() {
         </p>
 
         <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div className="aspect-[16/10] bg-slate-200">
+          <div className="aspect-[3/2] bg-slate-200">
             {item.imageUrl ? (
               <img
                 src={item.imageUrl}

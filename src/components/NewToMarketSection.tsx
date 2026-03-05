@@ -62,7 +62,7 @@ function PropertyCard({ item }: { item: DDPropertyItem }) {
       onClick={saveAndGo}
       className="group flex min-w-[280px] max-w-[320px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md sm:min-w-0"
     >
-      <div className="relative h-40 max-h-[180px] shrink-0 overflow-hidden bg-slate-200">
+      <div className="relative aspect-[3/2] w-full shrink-0 overflow-hidden bg-slate-200">
         {item.imageUrl ? (
           <img
             src={item.imageUrl}

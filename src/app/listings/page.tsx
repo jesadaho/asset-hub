@@ -1,14 +1,15 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Search, ChevronLeft, Home } from "lucide-react";
+import { Search, ChevronLeft, Home, ChevronRight } from "lucide-react";
 import { Header } from "@/components/Header";
 import { HeaderSimple } from "@/components/HeaderSimple";
 
 const PRIMARY = "#068e7b";
+const PER_PAGE = 12;
 
 type ListingItem = {
   id: string;
@@ -22,48 +23,59 @@ type ListingItem = {
 
 function ListingsPageContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const location = searchParams.get("location") ?? "";
-  const listingType = searchParams.get("listingType") ?? "rent";
+  const listingTypeParam =
+    searchParams.get("listingType") ?? searchParams.get("listing_type") ?? "rent";
+  const listingType =
+    listingTypeParam.toLowerCase() === "sale" ? "sale" : "rent";
+  const minPrice = searchParams.get("minPrice") ?? searchParams.get("min_price") ?? "";
+  const maxPrice = searchParams.get("maxPrice") ?? searchParams.get("max_price") ?? "";
+  const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
 
   const [listings, setListings] = useState<ListingItem[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchListings = useCallback(
-    async (cursor?: string | null) => {
-      if (cursor) setLoadingMore(true);
-      else setLoading(true);
+    async (pageNum: number) => {
+      setLoading(true);
       setError(null);
       try {
         const params = new URLSearchParams();
         params.set("listingType", listingType);
         if (location) params.set("location", location);
-        if (cursor) params.set("cursor", cursor);
-        params.set("limit", "12");
+        if (minPrice) params.set("minPrice", minPrice);
+        if (maxPrice) params.set("maxPrice", maxPrice);
+        params.set("limit", String(PER_PAGE));
+        params.set("page", String(pageNum));
         const res = await fetch(`/api/listings?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to load");
         const data = await res.json();
-        if (cursor) {
-          setListings((prev) => [...prev, ...(data.listings ?? [])]);
-        } else {
-          setListings(data.listings ?? []);
-        }
-        setNextCursor(data.nextCursor ?? null);
+        setListings(data.listings ?? []);
+        setTotalPages(data.totalPages ?? 0);
+        setTotalCount(data.totalCount ?? 0);
       } catch (e) {
         setError(e instanceof Error ? e.message : "เกิดข้อผิดพลาด");
       } finally {
         setLoading(false);
-        setLoadingMore(false);
       }
     },
-    [listingType, location]
+    [listingType, location, minPrice, maxPrice]
   );
 
   useEffect(() => {
-    fetchListings(null);
-  }, [listingType, location, fetchListings]);
+    fetchListings(page);
+  }, [page, fetchListings]);
+
+  const goToPage = (p: number) => {
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("page", String(p));
+    router.push(`${pathname}?${next.toString()}`);
+  };
 
   if (loading && listings.length === 0) {
     return (
@@ -119,7 +131,7 @@ function ListingsPageContent() {
                   href={`/listings/${item.id}`}
                   className="group overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
                 >
-                  <div className="aspect-[4/3] bg-slate-200">
+                  <div className="aspect-[3/2] bg-slate-200">
                     {item.imageUrl ? (
                       <img
                         src={item.imageUrl}
@@ -151,17 +163,60 @@ function ListingsPageContent() {
               ))}
             </div>
 
-            {nextCursor && (
-              <div className="mt-10 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => fetchListings(nextCursor)}
-                  disabled={loadingMore}
-                  className="rounded-lg px-6 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50"
-                  style={{ backgroundColor: PRIMARY }}
-                >
-                  {loadingMore ? "กำลังโหลด..." : "โหลดเพิ่ม"}
-                </button>
+            {listings.length > 0 && (
+              <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                {totalPages > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => goToPage(page - 1)}
+                      disabled={page <= 1 || loading}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      <ChevronLeft className="h-4 w-4" /> ก่อนหน้า
+                    </button>
+                    <div className="flex items-center gap-1">
+                      {(() => {
+                        const show = 5;
+                        let start = Math.max(1, page - Math.floor(show / 2));
+                        const end = Math.min(totalPages, start + show - 1);
+                        if (end - start + 1 < show) start = Math.max(1, end - show + 1);
+                        return Array.from({ length: end - start + 1 }, (_, i) => {
+                          const p = start + i;
+                          const isCurrent = p === page;
+                          return (
+                            <button
+                              key={p}
+                              type="button"
+                              onClick={() => goToPage(p)}
+                              disabled={loading}
+                              className={`min-w-[2.25rem] rounded-lg py-2 text-sm font-medium transition disabled:pointer-events-none disabled:opacity-50 ${
+                                isCurrent
+                                  ? "text-white"
+                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                              }`}
+                              style={isCurrent ? { backgroundColor: PRIMARY } : undefined}
+                            >
+                              {p}
+                            </button>
+                          );
+                        });
+                      })()}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => goToPage(page + 1)}
+                      disabled={page >= totalPages || loading}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      ถัดไป <ChevronRight className="h-4 w-4" />
+                    </button>
+                  </>
+                )}
+                <span className="w-full text-center text-sm text-slate-500 sm:w-auto">
+                  หน้า {page} จาก {totalPages || 1} · ทั้งหมด {totalCount} รายการ
+                  {totalPages <= 1 && totalCount > 0 && ` (แสดง ${PER_PAGE} รายการต่อหน้า)`}
+                </span>
               </div>
             )}
           </>

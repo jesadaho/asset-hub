@@ -323,7 +323,15 @@ export function SearchFilterBar({ embeddedInHero = false }: { embeddedInHero?: b
 
             <button
               type="button"
-              onClick={() => {}}
+              onClick={() => {
+                const p = new URLSearchParams();
+                const lt = (listingType ?? "SALE").toLowerCase();
+                p.set("listingType", lt === "rent" ? "rent" : "sale");
+                if (locationInput.trim()) p.set("location", locationInput.trim());
+                if (minPrice) p.set("minPrice", minPrice);
+                if (maxPrice) p.set("maxPrice", maxPrice);
+                router.push(`/listings?${p.toString()}`);
+              }}
               className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:opacity-95"
               style={{ backgroundColor: PRIMARY }}
               aria-label="ค้นหา"
