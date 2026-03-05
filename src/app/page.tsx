@@ -37,11 +37,11 @@ function HomePageContent() {
               href={LINE_PORJAI_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-3 self-start rounded-2xl px-4 py-3 transition hover:opacity-95 sm:self-center"
-              style={{ backgroundColor: PRIMARY }}
+              className="inline-flex shrink-0 items-center gap-3 self-start rounded-2xl px-5 py-3 transition hover:opacity-95 sm:self-center"
+              style={{ backgroundColor: "#1a4d47" }}
               aria-label="เพิ่มเพื่อนกับพอใจ บน LINE"
             >
-              {/* LINE icon: speech bubble ขาว + ตัวหนังสือ outline (export ใหม่ ไม่มีพื้นดำ) */}
+              {/* LINE icon */}
               <img
                 src="/images/line-icon.png"
                 alt=""
