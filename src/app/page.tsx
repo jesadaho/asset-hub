@@ -5,6 +5,7 @@ import { SearchFilterBar } from "@/components/SearchFilterBar";
 import { NewToMarketSection } from "@/components/NewToMarketSection";
 
 const LINE_PORJAI_URL = "https://line.me/ti/p/~@porjai_asset";
+const PRIMARY = "#068e7b";
 
 export default function HomePage() {
   return (
@@ -35,14 +36,25 @@ export default function HomePage() {
               href={LINE_PORJAI_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 self-start overflow-hidden rounded-2xl transition hover:opacity-95 sm:self-center"
+              className="inline-flex shrink-0 items-center gap-3 self-start rounded-2xl px-4 py-3 transition hover:opacity-95 sm:self-center"
+              style={{ backgroundColor: PRIMARY }}
               aria-label="เพิ่มเพื่อนกับพอใจ บน LINE"
             >
+              {/* LINE icon: speech bubble ขาว + ตัวหนังสือ outline (export ใหม่ ไม่มีพื้นดำ) */}
               <img
-                src="/images/line-porjai-banner.png"
-                alt="เพิ่มเพื่อนกับพอใจ – LINE OA ผู้ช่วยอัจฉริยะ ดูแลสินทรัพย์ของคุณ"
-                className="h-12 w-auto max-w-[200px] object-contain sm:h-14 sm:max-w-[240px]"
+                src="/images/line-icon.png"
+                alt=""
+                className="h-9 w-9 shrink-0 object-contain"
+                aria-hidden
               />
+              <span className="flex flex-col items-start text-left">
+                <span className="text-base font-bold leading-tight text-white sm:text-lg">
+                  เพิ่มเพื่อนกับพอใจ
+                </span>
+                <span className="text-xs font-normal leading-tight text-white/95 sm:text-sm">
+                  LINE OA ผู้ช่วยดูแลสินทรัพย์อัจฉริยะ
+                </span>
+              </span>
             </a>
           </div>
           <div className="mt-6 sm:mt-8">
