@@ -3,11 +3,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Heart, MoreVertical, Home, Clock, ChevronDown, ChevronUp, Bug } from "lucide-react";
+import { Heart, MoreVertical, Home, Clock, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Bug, Bed, Bath } from "lucide-react";
 import type { DDPropertyItem } from "@/lib/ddproperty-api";
 import type { DDPropertySearchDebug } from "@/app/api/ddproperty/search/route";
 
 const PRIMARY = "#068e7b";
+const ITEMS_PER_PAGE = 12;
 
 const THAI_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 
@@ -114,12 +115,18 @@ function PropertyCard({ item }: { item: DDPropertyItem }) {
             </button>
           </div>
         </div>
-        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0 text-sm text-slate-600">
+        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0 text-sm text-slate-600">
           {hasBedsBaths && item.bedrooms != null && Number(item.bedrooms) >= 0 && (
-            <span>{String(item.bedrooms)} เตียง</span>
+            <span className="inline-flex items-center gap-1">
+              <Bed className="h-4 w-4 text-slate-400" aria-hidden />
+              {String(item.bedrooms)} ห้องนอน
+            </span>
           )}
           {hasBedsBaths && item.bathrooms != null && Number(item.bathrooms) >= 0 && (
-            <span>{String(item.bathrooms)} ห้องน้ำ</span>
+            <span className="inline-flex items-center gap-1">
+              <Bath className="h-4 w-4 text-slate-400" aria-hidden />
+              {String(item.bathrooms)} ห้องน้ำ
+            </span>
           )}
           {item.areaSqm != null && (
             <span>{String(item.areaSqm)} ตร.ม.</span>
@@ -173,6 +180,9 @@ const DD_API_PARAM_KEYS = [
 export function NewToMarketSection() {
   const searchParams = useSearchParams();
   const [items, setItems] = useState<DDPropertyItem[]>([]);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [debug, setDebug] = useState<DDPropertySearchDebug | null>(null);
@@ -188,16 +198,27 @@ export function NewToMarketSection() {
     return params.toString();
   }, [searchParams]);
 
+  // Reset to page 1 when search filters change
+  useEffect(() => {
+    setPage(1);
+  }, [apiQueryString]);
+
   const fetchItems = useCallback(async () => {
     const qs = apiQueryString();
-    const url = `/api/ddproperty/search?${qs}`;
+    const url = `/api/ddproperty/search?${qs}&page=${page}`;
     setLoading(true);
     setError(null);
     setDebug(null);
     try {
       const res = await fetch(url);
       const text = await res.text();
-      let data: { message?: string; items?: DDPropertyItem[]; debug?: DDPropertySearchDebug } = {};
+      let data: {
+        message?: string;
+        items?: DDPropertyItem[];
+        totalPages?: number | null;
+        totalCount?: number | null;
+        debug?: DDPropertySearchDebug;
+      } = {};
       try {
         data = JSON.parse(text);
       } catch {
@@ -214,13 +235,17 @@ export function NewToMarketSection() {
         throw new Error(data.message || `Failed to load (${res.status})`);
       }
       setItems(Array.isArray(data.items) ? data.items : []);
+      setTotalCount(data.totalCount ?? null);
+      setTotalPages(data.totalPages ?? null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "เกิดข้อผิดพลาด");
       setItems([]);
+      setTotalCount(null);
+      setTotalPages(null);
     } finally {
       setLoading(false);
     }
-  }, [apiQueryString]);
+  }, [apiQueryString, page]);
 
   useEffect(() => {
     fetchItems();
@@ -229,9 +254,22 @@ export function NewToMarketSection() {
   return (
     <section className="border-b border-slate-200 bg-slate-50 px-4 py-10 sm:px-6 lg:px-8" aria-labelledby="new-to-market-title">
       <div className="mx-auto max-w-7xl">
-        <h2 id="new-to-market-title" className="text-xl font-bold text-slate-900 sm:text-2xl">
-          Explore Homes Near You
-        </h2>
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h2 id="new-to-market-title" className="text-xl font-bold text-slate-900 sm:text-2xl">
+            Explore Homes Near You
+          </h2>
+          {!loading && (
+            <span className="text-sm font-medium text-slate-600">
+              {totalCount != null && totalCount >= 0 ? (
+                <>{totalCount.toLocaleString()} รายการ</>
+              ) : totalPages != null && totalPages > 0 ? (
+                <>{(ITEMS_PER_PAGE * totalPages).toLocaleString()} รายการ</>
+              ) : (
+                <>{items.length} รายการ</>
+              )}
+            </span>
+          )}
+        </div>
         <div className="mt-4 border-b border-slate-200">
           <button
             type="button"
@@ -289,6 +327,19 @@ export function NewToMarketSection() {
                   </div>
                 )}
                 <div>
+                  <span className="font-semibold text-slate-700">$.pageProps / pageData:</span>
+                  <pre className="mt-0.5 max-h-32 overflow-auto break-all whitespace-pre-wrap bg-white/80 p-2 rounded text-xs">
+                    {[
+                      `pageProps keys: ${debug.pagePropsKeys?.length ? debug.pagePropsKeys.join(", ") : "(none)"}`,
+                      `pageData keys: ${debug.pageDataKeys?.length ? debug.pageDataKeys.join(", ") : "(none)"}`,
+                      `pageData.data keys: ${debug.pageDataDataKeys?.length ? debug.pageDataDataKeys.join(", ") : "(none)"}`,
+                      debug.paginationData != null
+                        ? `paginationData: ${JSON.stringify(debug.paginationData, null, 2)}`
+                        : "paginationData: (none)",
+                    ].join("\n\n")}
+                  </pre>
+                </div>
+                <div>
                   <span className="font-semibold text-slate-700">Response snippet:</span>
                   <pre className="mt-0.5 max-h-40 overflow-auto break-all whitespace-pre-wrap bg-white/80 p-2 rounded">
                     {debug.responseBodySnippet || "(empty)"}
@@ -313,11 +364,63 @@ export function NewToMarketSection() {
         )}
 
         {!loading && !error && items.length > 0 && (
-          <div className="mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
-            {items.map((item) => (
-              <PropertyCard key={item.id} item={item} />
-            ))}
-          </div>
+          <>
+            <div className="mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
+              {items.map((item) => (
+                <PropertyCard key={item.id} item={item} />
+              ))}
+            </div>
+
+            {totalPages != null && totalPages > 1 && (
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1 || loading}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-4 w-4" /> ก่อนหน้า
+                </button>
+                <div className="flex items-center gap-1">
+                  {(() => {
+                    const show = 5;
+                    let start = Math.max(1, page - Math.floor(show / 2));
+                    const end = Math.min(totalPages, start + show - 1);
+                    if (end - start + 1 < show) start = Math.max(1, end - show + 1);
+                    return Array.from({ length: Math.min(show, end - start + 1) }, (_, i) => {
+                      const p = start + i;
+                      const isCurrent = p === page;
+                      return (
+                        <button
+                          key={p}
+                          type="button"
+                          onClick={() => setPage(p)}
+                          disabled={loading}
+                          className={`min-w-[2.25rem] rounded-lg py-2 text-sm font-medium transition disabled:pointer-events-none disabled:opacity-50 ${
+                            isCurrent ? "text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          }`}
+                          style={isCurrent ? { backgroundColor: PRIMARY } : undefined}
+                        >
+                          {p}
+                        </button>
+                      );
+                    });
+                  })()}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPage((p) => Math.min(totalPages ?? p, p + 1))}
+                  disabled={(totalPages != null && page >= totalPages) || loading}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+                >
+                  ถัดไป <ChevronRight className="h-4 w-4" />
+                </button>
+                <span className="w-full text-center text-sm text-slate-500 sm:w-auto">
+                  หน้า {page} จาก {totalPages?.toLocaleString() ?? "—"}
+                </span>
+              </div>
+            )}
+          </>
         )}
 
         {!loading && !error && items.length === 0 && (

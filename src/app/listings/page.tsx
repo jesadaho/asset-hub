@@ -101,6 +101,12 @@ function ListingsPageContent() {
             {listingType === "rent" ? "ประกาศเช่า" : "ประกาศขาย"}
             {location ? ` · ${location}` : ""}
           </span>
+          {!loading && (
+            <span className="text-sm font-medium text-slate-700">
+              ทั้งหมด {totalCount.toLocaleString()} รายการ
+              {totalPages > 0 && ` · หน้า ${page} จาก ${totalPages}`}
+            </span>
+          )}
         </div>
 
         {error && (

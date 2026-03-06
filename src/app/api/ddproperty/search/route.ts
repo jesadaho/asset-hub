@@ -5,11 +5,11 @@ const DDPROPERTY_BASE =
 const HOST = "ddproperty-realtimeapi.p.rapidapi.com";
 const DEFAULT_LIMIT = 12;
 
-/** DDproperty: ใช้ COMMERCIAL เท่านั้น (RESIDENTIAL ไม่มีข้อมูล). */
+/** Default: residential ทั้งหมด (dropdown "ทั้งหมด"). */
 const DEFAULT_QUERY_PARAMS: Record<string, string> = {
-  property_type: "COMMERCIAL",
+  property_type: "RESIDENTIAL",
   listing_type: "SALE",
-  residential_property_type: "CONDO",
+  residential_property_type: "ALL",
   commercial_property_type: "ALL",
   location: "bangkok",
 };
@@ -331,11 +331,40 @@ function extractArray(data: unknown): unknown[] {
   return [];
 }
 
+/** Extract pagination from DDproperty response: pageProps.pageData.data.paginationData */
+function extractPaginationData(data: unknown): { totalPages: number | null; totalCount: number | null } {
+  if (!data || typeof data !== "object") return { totalPages: null, totalCount: null };
+  const o = data as Record<string, unknown>;
+  const pageProps = o.pageProps as Record<string, unknown> | undefined;
+  const pageData = pageProps?.pageData as Record<string, unknown> | undefined;
+  const dataObj = pageData?.data as Record<string, unknown> | undefined;
+  const paginationData = dataObj?.paginationData as Record<string, unknown> | undefined;
+  if (!paginationData || typeof paginationData !== "object") return { totalPages: null, totalCount: null };
+  const totalPages = paginationData.totalPages;
+  const totalCount =
+    typeof paginationData.totalCount === "number"
+      ? paginationData.totalCount
+      : typeof paginationData.totalResults === "number"
+        ? paginationData.totalResults
+        : typeof paginationData.total === "number"
+          ? paginationData.total
+          : null;
+  return {
+    totalPages: typeof totalPages === "number" && totalPages >= 0 ? totalPages : null,
+    totalCount: totalCount !== null && totalCount >= 0 ? totalCount : null,
+  };
+}
+
 export type DDPropertySearchDebug = {
   requestedUrl: string;
   statusCode: number;
   responseBodySnippet: string;
   errorMessage?: string;
+  /** $.pageProps structure (for debug view) */
+  pagePropsKeys?: string[];
+  pageDataKeys?: string[];
+  pageDataDataKeys?: string[];
+  paginationData?: Record<string, unknown>;
 };
 
 export async function GET(request: NextRequest) {
@@ -354,8 +383,9 @@ export async function GET(request: NextRequest) {
   searchParams.forEach((value, key) => {
     if (key !== "debug") params.set(key, value);
   });
-  // ใช้ property_type จาก URL (dropdown อาคารพานิช/ที่อยู่อาศัย); ไม่บังคับ COMMERCIAL
-  if (!params.has("property_type")) params.set("property_type", "COMMERCIAL");
+  // Default เป็น residential ทั้งหมด เมื่อ URL ไม่ส่งมา
+  if (!params.has("property_type")) params.set("property_type", "RESIDENTIAL");
+  if (!params.has("residential_property_type")) params.set("residential_property_type", "ALL");
   const requestedUrl = `${DDPROPERTY_BASE}?${params.toString()}`;
 
   try {
@@ -404,15 +434,48 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Log $.pageProps.pageData structure (safe: keys + paginationData only)
+    const o = json as Record<string, unknown>;
+    const pageProps = o?.pageProps as Record<string, unknown> | undefined;
+    const pageData = pageProps?.pageData;
+    console.log("[ddproperty/search] pageProps keys:", pageProps ? Object.keys(pageProps) : "undefined");
+    console.log("[ddproperty/search] pageData type:", pageData == null ? pageData : typeof pageData);
+    if (pageData && typeof pageData === "object") {
+      const pd = pageData as Record<string, unknown>;
+      console.log("[ddproperty/search] pageData keys:", Object.keys(pd));
+      if (pd.data && typeof pd.data === "object") {
+        const dataObj = pd.data as Record<string, unknown>;
+        console.log("[ddproperty/search] pageData.data keys:", Object.keys(dataObj));
+        if (dataObj.paginationData) {
+          console.log("[ddproperty/search] pageData.data.paginationData:", JSON.stringify(dataObj.paginationData));
+        }
+      }
+    }
+
     const rawList = extractArray(json);
     const items: DDPropertyItem[] = rawList.slice(0, DEFAULT_LIMIT).map(mapItem);
+    const { totalPages, totalCount } = extractPaginationData(json);
 
-    const body: { items: DDPropertyItem[]; debug?: DDPropertySearchDebug } = { items };
+    const body: {
+      items: DDPropertyItem[];
+      totalPages: number | null;
+      totalCount: number | null;
+      debug?: DDPropertySearchDebug;
+    } = { items, totalPages, totalCount };
     if (includeDebug) {
+      const pd = pageData as Record<string, unknown> | undefined;
+      const dataObj = pd?.data as Record<string, unknown> | undefined;
       body.debug = {
         requestedUrl,
         statusCode: res.status,
         responseBodySnippet: snippet,
+        pagePropsKeys: pageProps ? Object.keys(pageProps) : undefined,
+        pageDataKeys: pd && typeof pd === "object" ? Object.keys(pd) : undefined,
+        pageDataDataKeys: dataObj && typeof dataObj === "object" ? Object.keys(dataObj) : undefined,
+        paginationData:
+          dataObj?.paginationData && typeof dataObj.paginationData === "object"
+            ? (dataObj.paginationData as Record<string, unknown>)
+            : undefined,
       };
     }
     return NextResponse.json(body);

@@ -45,7 +45,16 @@ export function Header() {
             href="https://assethub.in.th"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-lg border-2 px-4 py-2 text-sm font-medium transition hover:opacity-90"
+            className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+            style={{ backgroundColor: PRIMARY }}
+          >
+            ลงประกาศ
+          </a>
+          <a
+            href="https://assethub.in.th"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center rounded-lg border-2 px-4 py-2 text-sm font-medium transition hover:opacity-90 sm:inline-flex"
             style={{ borderColor: PRIMARY, color: PRIMARY }}
           >
             Sign in

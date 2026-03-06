@@ -165,7 +165,7 @@ export default function DDListingDetailPage() {
               {item.bedrooms != null && Number(item.bedrooms) >= 0 && (
                 <div className="flex items-center gap-2 text-slate-700">
                   <Bed className="h-5 w-5 text-slate-400" aria-hidden />
-                  <span>{String(item.bedrooms)} เตียง</span>
+                  <span>{String(item.bedrooms)} ห้องนอน</span>
                 </div>
               )}
               {item.bathrooms != null && Number(item.bathrooms) >= 0 && (

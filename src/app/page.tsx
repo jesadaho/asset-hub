@@ -5,17 +5,14 @@ import { Header } from "@/components/Header";
 import { SearchFilterBar } from "@/components/SearchFilterBar";
 import { NewToMarketSection } from "@/components/NewToMarketSection";
 
-const LINE_PORJAI_URL = "https://line.me/ti/p/~@porjai_asset";
-const PRIMARY = "#068e7b";
-
 function HomePageContent() {
   return (
     <>
       <Header />
 
-      {/* Hero + Search: gradient ตาม reference (ฟ้าอ่อนบน → มิ้นท์ล่าง) + ดาวมุมขวาล่าง */}
+      {/* Hero + Search: อยู่ layer เหนือแถบสีเขียว (รวม dropdown) */}
       <section
-        className="relative flex min-h-[320px] flex-col items-center overflow-hidden px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14"
+        className="relative z-10 flex min-h-[320px] flex-col items-center overflow-visible px-4 py-10 sm:px-6 sm:py-12 lg:px-8 lg:py-14"
         style={{
           background: "linear-gradient(180deg, #f0f9f8 0%, #e0f2ef 40%, #ccece6 100%)",
         }}
@@ -29,44 +26,18 @@ function HomePageContent() {
           </svg>
         </div>
         <div className="mx-auto w-full max-w-7xl">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-            <h1 className="text-left text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl" style={{ color: "#252a32" }}>
-              ค้นหาบ้านและคอนโดรวมครบ ง่ายๆในที่เดียว
-            </h1>
-            <a
-              href={LINE_PORJAI_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-3 self-start rounded-2xl px-5 py-3 transition hover:opacity-95 sm:self-center"
-              style={{ backgroundColor: "#1a4d47" }}
-              aria-label="เพิ่มเพื่อนกับพอใจ บน LINE"
-            >
-              {/* LINE icon */}
-              <img
-                src="/images/line-icon.png"
-                alt=""
-                className="h-9 w-9 shrink-0 object-contain"
-                aria-hidden
-              />
-              <span className="flex flex-col items-start text-left">
-                <span className="text-base font-bold leading-tight text-white sm:text-lg">
-                  เพิ่มเพื่อนกับพอใจ
-                </span>
-                <span className="text-xs font-normal leading-tight text-white/95 sm:text-sm">
-                  LINE OA ผู้ช่วยดูแลสินทรัพย์อัจฉริยะ
-                </span>
-              </span>
-            </a>
-          </div>
+          <h1 className="text-left text-xl font-bold tracking-tight sm:text-2xl lg:text-3xl" style={{ color: "#252a32" }}>
+            ค้นหาบ้านและคอนโดรวมครบ ง่ายๆในที่เดียว
+          </h1>
           <div className="mt-6 sm:mt-8">
             <SearchFilterBar embeddedInHero />
           </div>
         </div>
       </section>
 
-      {/* แถบข้อความสีเขียว (gradient) – ชิดซ้ายแนวเดียวกับ CTA */}
+      {/* แถบข้อความสีเขียว (gradient) – อยู่ใต้ search box */}
       <div
-        className="py-3"
+        className="relative z-0 py-3"
         style={{
           background: "linear-gradient(90deg, #003d35 0%, #05a18c 100%)",
         }}
