@@ -58,7 +58,7 @@ export default function SignInLinePage() {
 
       const data = (await res.json()) as { redirectUrl?: string };
       setStatus("done");
-      window.location.href = data.redirectUrl ?? "https://www.assethub.in.th/admin/dashboard";
+      window.location.href = data.redirectUrl ?? "/";
     }
 
     run();

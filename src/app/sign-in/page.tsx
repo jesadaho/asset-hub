@@ -6,9 +6,8 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
-const DASHBOARD_URL =
-  process.env.NEXT_PUBLIC_REDIRECT_AFTER_SIGNIN ??
-  "https://www.assethub.in.th/admin/dashboard";
+const REDIRECT_AFTER_LOGIN =
+  process.env.NEXT_PUBLIC_REDIRECT_AFTER_SIGNIN ?? "/";
 const ALLOW_DEV_LOGIN = process.env.NEXT_PUBLIC_ALLOW_DEV_LOGIN === "true";
 
 function GoogleIcon() {
@@ -82,7 +81,7 @@ export default function SignInPage() {
           <div className="mt-8 flex flex-col gap-3">
             <button
               type="button"
-              onClick={() => signIn("google", { callbackUrl: DASHBOARD_URL })}
+              onClick={() => signIn("google", { callbackUrl: REDIRECT_AFTER_LOGIN })}
               className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
               <GoogleIcon />

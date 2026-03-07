@@ -6,9 +6,8 @@ import {
   LINE_SESSION_COOKIE_OPTIONS,
 } from "@/lib/auth/session";
 
-const DASHBOARD_URL =
-  process.env.NEXTAUTH_REDIRECT_AFTER_SIGNIN ??
-  "https://www.assethub.in.th/admin/dashboard";
+const REDIRECT_AFTER_LOGIN =
+  process.env.NEXTAUTH_REDIRECT_AFTER_SIGNIN ?? "/";
 
 export async function POST(request: NextRequest) {
   let body: { token?: string };
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
       picture: profile.pictureUrl ?? null,
     });
 
-    const res = NextResponse.json({ ok: true, redirectUrl: DASHBOARD_URL });
+    const res = NextResponse.json({ ok: true, redirectUrl: REDIRECT_AFTER_LOGIN });
     res.cookies.set(LINE_SESSION_COOKIE_NAME, sessionToken, LINE_SESSION_COOKIE_OPTIONS);
     return res;
   } catch (err) {

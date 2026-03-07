@@ -2,8 +2,7 @@ import NextAuth, { type NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
 const DEFAULT_REDIRECT =
-  process.env.NEXTAUTH_REDIRECT_AFTER_SIGNIN ??
-  "https://www.assethub.in.th/admin/dashboard";
+  process.env.NEXTAUTH_REDIRECT_AFTER_SIGNIN ?? "/";
 
 function googleProvider(): NextAuthOptions["providers"][0] | null {
   const id = process.env.AUTH_GOOGLE_ID?.trim();
