@@ -20,29 +20,21 @@ export function Header() {
         <nav className="hidden items-center gap-6 sm:flex" aria-label="หลัก">
           <Link
             href="/listings?listingType=sale"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="text-base font-medium text-slate-600 hover:text-slate-900"
           >
             ขาย
           </Link>
           <Link
             href="/listings?listingType=rent"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="text-base font-medium text-slate-600 hover:text-slate-900"
           >
             เช่า
           </Link>
-          <a
-            href="https://assethub.in.th"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
-          >
-            สำหรับเจ้าของ
-          </a>
           <Link
             href="/review"
-            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="text-base font-medium text-slate-600 hover:text-slate-900"
           >
-            รีวิว
+            รีวิวฉบับนักลงทุน
           </Link>
         </nav>
         <div className="flex items-center gap-2 sm:gap-3">
