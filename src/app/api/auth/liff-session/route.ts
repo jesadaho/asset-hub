@@ -25,17 +25,34 @@ export async function POST(request: NextRequest) {
 
   const profile = await verifyLiffToken(token);
   if (!profile) {
-    return NextResponse.json({ message: "Invalid LINE token" }, { status: 401 });
+    console.error("[liff-session] LINE profile API rejected token or returned non-ok");
+    return NextResponse.json(
+      {
+        message:
+          "Invalid LINE token. ตรวจสอบว่า LIFF Endpoint URL ใน LINE Developers ตรงกับ URL ของหน้านี้ และ NEXTAUTH_SECRET ตั้งค่าแล้ว",
+      },
+      { status: 401 }
+    );
   }
 
-  const sessionToken = createLineSessionToken({
-    userId: profile.userId,
-    name: profile.displayName ?? null,
-    picture: profile.pictureUrl ?? null,
-  });
+  try {
+    const sessionToken = createLineSessionToken({
+      userId: profile.userId,
+      name: profile.displayName ?? null,
+      picture: profile.pictureUrl ?? null,
+    });
 
-  const res = NextResponse.json({ ok: true, redirectUrl: DASHBOARD_URL });
-  res.cookies.set(LINE_SESSION_COOKIE_NAME, sessionToken, LINE_SESSION_COOKIE_OPTIONS);
-
-  return res;
+    const res = NextResponse.json({ ok: true, redirectUrl: DASHBOARD_URL });
+    res.cookies.set(LINE_SESSION_COOKIE_NAME, sessionToken, LINE_SESSION_COOKIE_OPTIONS);
+    return res;
+  } catch (err) {
+    console.error("[liff-session] Failed to create session:", err);
+    return NextResponse.json(
+      {
+        message:
+          "Failed to create session. ตรวจสอบว่า NEXTAUTH_SECRET ตั้งค่าใน environment แล้ว",
+      },
+      { status: 500 }
+    );
+  }
 }

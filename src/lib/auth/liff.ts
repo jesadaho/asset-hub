@@ -13,7 +13,11 @@ export async function verifyLiffToken(accessToken: string | null): Promise<{
     const res = await fetch("https://api.line.me/v2/profile", {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const text = await res.text();
+      console.error("[verifyLiffToken] LINE API status:", res.status, text.slice(0, 200));
+      return null;
+    }
 
     const data = (await res.json()) as {
       userId?: string;
