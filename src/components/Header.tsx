@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
@@ -15,9 +15,35 @@ type SessionUser = {
   provider: string;
 } | null;
 
+function useOnClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
+  useEffect(() => {
+    const listener = (e: MouseEvent | TouchEvent) => {
+      if (!ref.current || ref.current.contains(e.target as Node)) return;
+      handler();
+    };
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
+    return () => {
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
+    };
+  }, [ref, handler]);
+}
+
+function getInitials(name: string | null): string {
+  if (!name?.trim()) return "?";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return name.slice(0, 2).toUpperCase();
+}
+
 export function Header() {
   const [user, setUser] = useState<SessionUser>(null);
   const [sessionLoading, setSessionLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside(menuRef, () => setMenuOpen(false));
 
   useEffect(() => {
     fetch("/api/auth/session", { credentials: "include" })
@@ -30,6 +56,7 @@ export function Header() {
   }, []);
 
   const handleSignOut = async () => {
+    setMenuOpen(false);
     if (user?.provider === "line") {
       await fetch("/api/auth/signout-line", { method: "POST", credentials: "include" });
       window.location.href = "/";
@@ -81,22 +108,55 @@ export function Header() {
           </a>
           {!sessionLoading &&
             (user ? (
-              <>
-                <Link
-                  href="/profile"
-                  className="hidden items-center rounded-lg border-2 px-4 py-2 text-sm font-medium transition hover:opacity-90 sm:inline-flex"
-                  style={{ borderColor: PRIMARY, color: PRIMARY }}
-                >
-                  Profile
-                </Link>
+              <div className="relative hidden sm:block" ref={menuRef}>
                 <button
                   type="button"
-                  onClick={handleSignOut}
-                  className="hidden rounded-lg px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 sm:inline-block"
+                  onClick={() => setMenuOpen((o) => !o)}
+                  className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-slate-200 transition hover:border-slate-300"
+                  style={{ borderColor: menuOpen ? PRIMARY : undefined }}
+                  aria-expanded={menuOpen}
+                  aria-haspopup="true"
                 >
-                  Sign out
+                  {user.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={user.image}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span
+                      className="text-sm font-medium text-slate-600"
+                      style={{ color: PRIMARY }}
+                    >
+                      {getInitials(user.name)}
+                    </span>
+                  )}
                 </button>
-              </>
+                {menuOpen && (
+                  <div
+                    className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+                    role="menu"
+                  >
+                    <Link
+                      href="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+                      role="menuitem"
+                    >
+                      โปรไฟล์
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleSignOut}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+                      role="menuitem"
+                    >
+                      ออกจากระบบ
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <Link
                 href="/sign-in"
