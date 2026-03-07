@@ -1,32 +1,19 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getLineSessionFromCookie } from "@/lib/auth/session";
+import { getSessionWithAdmin } from "@/lib/auth/get-session";
+import { upsertUser } from "@/lib/db/upsert-user";
 
 export async function GET() {
-  const nextAuthSession = await getServerSession(authOptions);
-  if (nextAuthSession?.user) {
-    const u = nextAuthSession.user as { id?: string; name?: string | null; email?: string | null; image?: string | null };
-    return Response.json({
-      user: {
-        id: u.id ?? u.email ?? "",
-        name: u.name ?? null,
-        image: u.image ?? null,
-        provider: "nextauth",
-      },
-    });
+  const { user } = await getSessionWithAdmin();
+  if (user) {
+    try {
+      await upsertUser({
+        id: user.id,
+        name: user.name,
+        image: user.image,
+        provider: user.provider,
+      });
+    } catch {
+      // Session still works if upsert fails (e.g. DB down)
+    }
   }
-
-  const lineSession = await getLineSessionFromCookie();
-  if (lineSession) {
-    return Response.json({
-      user: {
-        id: lineSession.userId,
-        name: lineSession.name ?? null,
-        image: lineSession.picture ?? null,
-        provider: "line",
-      },
-    });
-  }
-
-  return Response.json({ user: null });
+  return Response.json({ user });
 }

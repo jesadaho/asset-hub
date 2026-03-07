@@ -12,6 +12,7 @@ const DEFAULT_QUERY_PARAMS: Record<string, string> = {
   residential_property_type: "ALL",
   commercial_property_type: "ALL",
   location: "bangkok",
+  language: "th",
 };
 
 export type DDPropertyItem = {

@@ -13,6 +13,7 @@ type SessionUser = {
   name: string | null;
   image: string | null;
   provider: string;
+  isAdmin?: boolean;
 } | null;
 
 function useOnClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
@@ -66,7 +67,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link
           href="/"
@@ -89,7 +90,7 @@ export function Header() {
             เช่า
           </Link>
           <Link
-            href="/review"
+            href="/insight"
             className="text-base font-medium text-slate-600 hover:text-slate-900"
           >
             รีวิวฉบับนักลงทุน
@@ -135,9 +136,19 @@ export function Header() {
                 </button>
                 {menuOpen && (
                   <div
-                    className="absolute right-0 top-full z-50 mt-2 min-w-[180px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+                    className="absolute right-0 top-full z-[100] mt-2 min-w-[180px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
                     role="menu"
                   >
+                    {user.isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+                        role="menuitem"
+                      >
+                        Admin
+                      </Link>
+                    )}
                     <Link
                       href="/profile"
                       onClick={() => setMenuOpen(false)}

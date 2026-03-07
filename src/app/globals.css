@@ -29,3 +29,33 @@ body {
   -moz-osx-font-smoothing: auto;
   text-rendering: optimizeLegibility;
 }
+
+/* Ghost-style Markdown editor (Project Review) */
+.markdown-editor-ghost .w-md-editor {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: none;
+}
+.markdown-editor-ghost .w-md-editor-toolbar {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  min-height: 40px;
+}
+.markdown-editor-ghost .w-md-editor-toolbar li button {
+  color: #64748b;
+}
+.markdown-editor-ghost .w-md-editor-toolbar li button:hover {
+  color: var(--primary);
+}
+.markdown-editor-ghost .w-md-editor-content {
+  font-size: 17px;
+  line-height: 1.65;
+}
+.markdown-editor-ghost .wmde-markdown {
+  padding: 20px 24px !important;
+}
+.markdown-editor-ghost .w-md-editor-area {
+  font-size: 17px;
+  line-height: 1.65;
+}
