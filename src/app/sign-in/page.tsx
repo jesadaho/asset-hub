@@ -1,10 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
+const DASHBOARD_URL =
+  process.env.NEXT_PUBLIC_REDIRECT_AFTER_SIGNIN ??
+  "https://www.assethub.in.th/admin/dashboard";
+const ALLOW_DEV_LOGIN = process.env.NEXT_PUBLIC_ALLOW_DEV_LOGIN === "true";
 
 function GoogleIcon() {
   return (
@@ -38,6 +43,26 @@ function LineIcon() {
 }
 
 export default function SignInPage() {
+  const [devLoading, setDevLoading] = useState(false);
+
+  const handleDevLogin = async () => {
+    setDevLoading(true);
+    try {
+      const res = await fetch("/api/auth/dev-session", {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+      setDevLoading(false);
+    } catch {
+      setDevLoading(false);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -57,7 +82,7 @@ export default function SignInPage() {
           <div className="mt-8 flex flex-col gap-3">
             <button
               type="button"
-              onClick={() => signIn("google", { callbackUrl: process.env.NEXT_PUBLIC_REDIRECT_AFTER_SIGNIN ?? "https://www.assethub.in.th/admin/dashboard" })}
+              onClick={() => signIn("google", { callbackUrl: DASHBOARD_URL })}
               className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
               <GoogleIcon />
@@ -71,6 +96,16 @@ export default function SignInPage() {
               <LineIcon />
               Sign in with LINE
             </Link>
+            {ALLOW_DEV_LOGIN && (
+              <button
+                type="button"
+                onClick={handleDevLogin}
+                disabled={devLoading}
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 transition hover:bg-amber-100 disabled:opacity-50"
+              >
+                {devLoading ? "กำลังเข้า..." : "Dev: Login as test user"}
+              </button>
+            )}
           </div>
 
           <p className="mt-6 text-center text-xs text-slate-400">
