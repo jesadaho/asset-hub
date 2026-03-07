@@ -38,6 +38,12 @@ export function Header() {
           >
             สำหรับเจ้าของ
           </a>
+          <Link
+            href="/review"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            รีวิว
+          </Link>
         </nav>
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
