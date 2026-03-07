@@ -50,15 +50,13 @@ export function Header() {
           >
             ลงประกาศ
           </a>
-          <a
-            href="https://assethub.in.th"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/sign-in"
             className="hidden items-center rounded-lg border-2 px-4 py-2 text-sm font-medium transition hover:opacity-90 sm:inline-flex"
             style={{ borderColor: PRIMARY, color: PRIMARY }}
           >
             Sign in
-          </a>
+          </Link>
         </div>
       </div>
     </header>

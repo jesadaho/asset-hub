@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/AuthProvider";
 import { Footer } from "@/components/Footer";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 
@@ -20,12 +21,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="th">
-      <body className={`${ibmPlexSansThai.className} min-h-screen`}>
+      <body className={`${ibmPlexSansThai.className} min-h-screen`} suppressHydrationWarning>
         <LocaleProvider>
-          <div className="flex min-h-screen flex-col">
-            {children}
-            <Footer />
-          </div>
+          <AuthProvider>
+            <div className="flex min-h-screen flex-col">
+              {children}
+              <Footer />
+            </div>
+          </AuthProvider>
         </LocaleProvider>
       </body>
     </html>
