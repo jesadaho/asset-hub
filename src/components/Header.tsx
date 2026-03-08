@@ -77,7 +77,7 @@ export function Header() {
           className="flex items-center gap-2 text-xl font-semibold text-slate-900"
         >
           <Image src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
-          Asset Hub
+          AssetHub
         </Link>
         <nav className="hidden items-center gap-6 sm:flex" aria-label="หลัก">
           <Link

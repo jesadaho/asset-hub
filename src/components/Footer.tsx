@@ -28,7 +28,7 @@ export function Footer() {
             {/* ดาวน์โหลดแอป */}
             <div>
               <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
-                ดาวน์โหลดแอป Asset Hub
+                ดาวน์โหลดแอป AssetHub
               </h3>
               <div className="mt-3 flex flex-col gap-2">
                 <a
@@ -119,12 +119,12 @@ export function Footer() {
               </nav>
             </div>
 
-            {/* Asset Hub */}
+            {/* AssetHub */}
             <div>
               <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
-                Asset Hub
+                AssetHub
               </h3>
-              <nav className="mt-3 flex flex-col" aria-label="Asset Hub">
+              <nav className="mt-3 flex flex-col" aria-label="AssetHub">
                 <a href="https://assethub.in.th" target="_blank" rel="noopener noreferrer" className={footerLinkClass}>
                   เกี่ยวกับเรา
                 </a>
@@ -152,7 +152,7 @@ export function Footer() {
                 className="mt-3 flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
                 style={{ backgroundColor: PRIMARY }}
               >
-                Asset Hub สำหรับเจ้าของ
+                AssetHub สำหรับเจ้าของ
                 <ExternalLink className="h-4 w-4" aria-hidden />
               </a>
               <nav className="mt-4 flex flex-col" aria-label="มืออาชีพ">
@@ -190,7 +190,7 @@ export function Footer() {
           </nav>
           <div className="flex flex-wrap items-center gap-4">
             <p className="text-xs text-slate-600">
-              © 2000–{currentYear} Asset Hub. สงวนลิขสิทธิ์.
+              © 2000–{currentYear} AssetHub. สงวนลิขสิทธิ์.
             </p>
             <div className="flex items-center gap-3" aria-label="โซเชียลมีเดีย">
               <a

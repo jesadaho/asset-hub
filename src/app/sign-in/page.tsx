@@ -76,7 +76,7 @@ export default function SignInPage() {
           style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
         >
           <h1 className="text-center text-xl font-bold text-slate-900">ลงชื่อเข้าใช้</h1>
-          <p className="mt-2 text-center text-sm text-slate-500">Sign in to continue to Asset Hub</p>
+          <p className="mt-2 text-center text-sm text-slate-500">Sign in to continue to AssetHub</p>
 
           <div className="mt-8 flex flex-col gap-3">
             <button

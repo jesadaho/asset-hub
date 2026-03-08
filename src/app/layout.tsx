@@ -12,8 +12,8 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
 });
 
 export const metadata: Metadata = {
-  title: "Asset Hub – ค้นหาบ้านและคอนโด",
-  description: "ค้นหาบ้านและคอนโดที่เหมาะกับคุณ จากแพลตฟอร์ม Asset Hub",
+  title: "AssetHub – ค้นหาบ้านและคอนโด",
+  description: "ค้นหาบ้านและคอนโดที่เหมาะกับคุณ จากแพลตฟอร์ม AssetHub",
 };
 
 export default function RootLayout({

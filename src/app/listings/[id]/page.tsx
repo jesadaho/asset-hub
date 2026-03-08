@@ -127,7 +127,7 @@ export default function ListingDetailPage() {
   const lineHref = hasLineAgent
     ? `https://line.me/ti/p/~${listing.agentLineAccountId!.trim().replace(/^@/, "")}`
     : "https://assethub.in.th";
-  const agentLabel = listing.agentName?.trim() || "Asset Hub";
+  const agentLabel = listing.agentName?.trim() || "AssetHub";
   const listedStr = formatListedDate(listing.listedAt);
   const descriptionShort =
     listing.description && listing.description.length > 200
@@ -335,7 +335,7 @@ export default function ListingDetailPage() {
                   style={{ backgroundColor: PRIMARY }}
                 >
                   <Phone className="h-4 w-4" aria-hidden />
-                  {hasLineAgent ? "ติดต่อเอเจนต์" : "ติดต่อผ่าน Asset Hub"}
+                  {hasLineAgent ? "ติดต่อเอเจนต์" : "ติดต่อผ่าน AssetHub"}
                 </a>
                 <a
                   href="https://assethub.in.th"
