@@ -128,16 +128,6 @@ export function Header() {
                   <div className="mb-2">
                     <LanguageSwitcher />
                   </div>
-                  <a
-                    href="https://assethub.in.th"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setMobileNavOpen(false)}
-                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-                    style={{ backgroundColor: PRIMARY }}
-                  >
-                    ลงประกาศ
-                  </a>
                   {!sessionLoading &&
                     (user ? (
                       <div className="mt-2 flex flex-col gap-0.5">
@@ -200,8 +190,10 @@ export function Header() {
             รีวิวโครงการ
           </Link>
         </nav>
-        <div className="hidden items-center gap-2 sm:flex sm:gap-3">
-          <LanguageSwitcher />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:block">
+            <LanguageSwitcher />
+          </div>
           <a
             href="https://assethub.in.th"
             target="_blank"
