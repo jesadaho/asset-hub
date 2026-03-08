@@ -10,6 +10,7 @@ type Post = {
   status: string;
   type?: string;
   updatedAt: string;
+  viewCount?: number;
 };
 
 function useOnClickOutside(
@@ -112,6 +113,9 @@ export default function AdminBlogPage() {
                     สถานะ
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
+                    จำนวนวิว
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                     อัปเดต
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -141,6 +145,9 @@ export default function AdminBlogPage() {
                       >
                         {p.status}
                       </span>
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-600">
+                      {typeof p.viewCount === "number" ? p.viewCount.toLocaleString() : "—"}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-sm text-slate-500">
                       {p.updatedAt

@@ -42,15 +42,30 @@ function mapInsightListItem(
   };
 }
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") ?? "10", 10) || 10));
   const skip = (page - 1) * limit;
+  const q = (searchParams.get("q") ?? "").trim();
 
   try {
     await connectDB();
-    const filter = { type: "project_review" as const, status: "published" as const };
+    const filter: Record<string, unknown> = { type: "project_review", status: "published" };
+    if (q.length > 0) {
+      const re = new RegExp(escapeRegex(q), "i");
+      filter.$or = [
+        { title: re },
+        { projectName: re },
+        { developer: re },
+        { location: re },
+        { metaDescription: re },
+      ];
+    }
     const [posts, totalCount] = await Promise.all([
       BlogPost.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit).lean(),
       BlogPost.countDocuments(filter),

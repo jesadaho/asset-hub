@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -93,6 +93,17 @@ export default function InsightDetailPage() {
   const [otherInsights, setOtherInsights] = useState<InsightListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const viewRecordedRef = useRef(false);
+
+  useEffect(() => {
+    viewRecordedRef.current = false;
+  }, [slug]);
+
+  useEffect(() => {
+    if (!data?.slug || viewRecordedRef.current) return;
+    viewRecordedRef.current = true;
+    fetch(`/api/insights/${encodeURIComponent(data.slug)}/view`, { method: "POST" }).catch(() => {});
+  }, [data?.slug]);
 
   useEffect(() => {
     if (!slug?.trim()) {

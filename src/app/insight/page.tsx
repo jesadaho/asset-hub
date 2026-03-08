@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
@@ -63,21 +64,48 @@ function InsightCardRow({ item }: { item: InsightItem }) {
   return <div className={className}>{cardContent}</div>;
 }
 
+const PER_PAGE = 10;
+
 export default function InsightPage() {
   const [posts, setPosts] = useState<InsightItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [searchInput, setSearchInput] = useState("");
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
-    fetch("/api/insights?limit=10")
+    const t = setTimeout(() => {
+      setQuery(searchInput.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setError(null);
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page), limit: String(PER_PAGE) });
+    if (query) params.set("q", query);
+    fetch(`/api/insights?${params.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load");
         return res.json();
       })
-      .then((data: { posts: InsightItem[] }) => setPosts(data.posts ?? []))
+      .then((data: { posts: InsightItem[]; totalPages: number; totalCount: number }) => {
+        setPosts(data.posts ?? []);
+        setTotalPages(Math.max(1, data.totalPages ?? 1));
+        setTotalCount(data.totalCount ?? 0);
+      })
       .catch((e) => setError(e instanceof Error ? e.message : "เกิดข้อผิดพลาด"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [page, query]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [page, query]);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -91,6 +119,24 @@ export default function InsightPage() {
           <p className="mt-2 text-slate-600">
             รีวิวบ้านและคอนโดทั่วประเทศ เจาะลึกด้วยข้อมูลสถิติการลงทุน Rental Yield จริงจากหน้างาน และวิเคราะห์สภาพคล่องรายโครงการ เพื่อเป็นเครื่องมือสำคัญในการตัดสินใจลงทุนของคุณ
           </p>
+          <div className="relative mt-4 max-w-md">
+            <label htmlFor="insight-search" className="sr-only">
+              ค้นหารีวิว
+            </label>
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+              aria-hidden
+            />
+            <input
+              id="insight-search"
+              type="search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="ค้นหาชื่อโครงการ, ผู้พัฒนา, ทำเล..."
+              className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 sm:text-sm"
+              aria-label="ค้นหารีวิว"
+            />
+          </div>
         </div>
 
         {error && (
@@ -129,9 +175,13 @@ export default function InsightPage() {
 
         {!loading && posts.length === 0 && !error && (
           <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
-            <p className="font-medium text-slate-700">ยังไม่มีรีวิว</p>
+            <p className="font-medium text-slate-700">
+              {query ? "ไม่พบรายการที่ตรงกับคำค้น" : "ยังไม่มีรีวิว"}
+            </p>
             <p className="mt-1 text-sm text-slate-500">
-              รีวิวโครงการจะแสดงที่นี่เมื่อมีโพสต์ที่เผยแพร่แล้ว
+              {query
+                ? "ลองเปลี่ยนคำค้นหรือลบคำค้นเพื่อดูทั้งหมด"
+                : "รีวิวโครงการจะแสดงที่นี่เมื่อมีโพสต์ที่เผยแพร่แล้ว"}
             </p>
           </div>
         )}
@@ -142,6 +192,37 @@ export default function InsightPage() {
               {posts.map((item) => (
                 <InsightCardRow key={item.id} item={item} />
               ))}
+              {totalPages > 1 && (
+                <nav
+                  className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6"
+                  aria-label="เลื่อนหน้า"
+                >
+                  <p className="text-sm text-slate-600">
+                    แสดง {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, totalCount)} จาก {totalCount} รายการ
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      ก่อนหน้า
+                    </button>
+                    <span className="px-2 text-sm text-slate-600">
+                      หน้า {page} / {totalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page >= totalPages}
+                      className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-50"
+                    >
+                      ถัดไป
+                    </button>
+                  </div>
+                </nav>
+              )}
             </div>
             <aside className="lg:col-span-1">
               <div className="rounded-xl border border-slate-200 bg-slate-100/80 p-5">

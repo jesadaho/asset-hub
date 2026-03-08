@@ -42,6 +42,7 @@ export interface IBlogPost {
   distanceToTransit?: string;
   nearbyCatalyst?: string;
   imageKeys?: string[];
+  viewCount?: number;
 }
 
 const BlogPostSchema = new mongoose.Schema<IBlogPost>(
@@ -74,6 +75,7 @@ const BlogPostSchema = new mongoose.Schema<IBlogPost>(
     distanceToTransit: String,
     nearbyCatalyst: String,
     imageKeys: { type: [String], default: [] },
+    viewCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -20,6 +20,7 @@ function mapPostToJson(
     metaImage: p.metaImage,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
+    viewCount: p.viewCount ?? 0,
   };
   if (p.type === "project_review") {
     out.projectName = p.projectName;
