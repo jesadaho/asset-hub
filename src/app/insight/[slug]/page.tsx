@@ -163,6 +163,16 @@ export default function InsightDetailPage() {
   return (
     <div className="min-h-screen">
       <Header />
+      {/* ปุ่ม back สำหรับ mobile: sticky ให้เห็นตลอด */}
+      <div className="sticky top-14 z-30 flex justify-start border-b border-white/10 bg-[#0f4c4c] px-4 py-2 sm:hidden">
+        <Link
+          href="/insight"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-white/90 hover:text-white"
+        >
+          <span aria-hidden>←</span>
+          กลับไป Insight
+        </Link>
+      </div>
       {/* Zone บน: BG สีเขียว สูง 400px */}
       <div
         className="relative z-20 w-full overflow-hidden"
