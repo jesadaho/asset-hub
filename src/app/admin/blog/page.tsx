@@ -95,7 +95,8 @@ export default function AdminBlogPage() {
         {error && <p className="text-red-600">{error}</p>}
         {!loading && !error && (
           <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <table className="min-w-full divide-y divide-slate-200">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200">
               <thead>
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -170,6 +171,7 @@ export default function AdminBlogPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         )}
     </main>

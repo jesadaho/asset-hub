@@ -15,7 +15,8 @@ export default async function AdminUsersPage() {
         <h1 className="text-2xl font-semibold text-slate-900">ผู้ใช้</h1>
       </div>
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-          <table className="min-w-full divide-y divide-slate-200">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-200">
             <thead>
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
@@ -67,6 +68,7 @@ export default async function AdminUsersPage() {
               ))}
             </tbody>
           </table>
+          </div>
         </div>
     </main>
   );

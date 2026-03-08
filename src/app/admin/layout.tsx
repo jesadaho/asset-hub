@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionWithAdmin } from "@/lib/auth/get-session";
 import { Header } from "@/components/Header";
-import { AdminSideMenu } from "@/components/AdminSideMenu";
+import { AdminShell } from "@/components/AdminShell";
 
 export default async function AdminLayout({
   children,
@@ -14,10 +14,7 @@ export default async function AdminLayout({
   return (
     <>
       <Header />
-      <div className="flex min-h-0 flex-1">
-        <AdminSideMenu />
-        <div className="min-w-0 flex-1">{children}</div>
-      </div>
+      <AdminShell>{children}</AdminShell>
     </>
   );
 }

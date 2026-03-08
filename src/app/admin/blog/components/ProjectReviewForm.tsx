@@ -1104,7 +1104,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                 <label className="block text-xs text-slate-500">
                   Market Rent (ช่วงราคาค่าเช่าจริง)
                 </label>
-                <div className="mt-1 overflow-hidden rounded-lg border border-slate-300 bg-white">
+                <div className="mt-1 overflow-x-auto rounded-lg border border-slate-300 bg-white">
                   <table className="w-full min-w-[280px] text-sm">
                     <thead>
                       <tr className="border-b border-slate-200 bg-slate-50">
