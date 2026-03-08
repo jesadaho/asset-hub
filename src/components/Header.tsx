@@ -72,13 +72,61 @@ export function Header() {
   return (
     <header className="relative sticky top-0 z-50 border-b border-slate-200 bg-white" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-xl font-semibold text-slate-900"
-        >
-          <Image src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
-          AssetHub
-        </Link>
+        <div className="relative flex flex-1 items-center gap-2 sm:flex-initial" ref={mobileNavRef}>
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen((o) => !o)}
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 sm:hidden"
+            aria-expanded={mobileNavOpen}
+            aria-label="เปิดเมนู"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              {mobileNavOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-xl font-semibold text-slate-900"
+          >
+            <Image src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
+            AssetHub
+          </Link>
+          {mobileNavOpen && (
+            <div
+              className="absolute left-0 top-full z-[100] mt-1 w-[280px] border border-slate-200 bg-white shadow-lg sm:hidden"
+              role="navigation"
+              aria-label="เมนูหลัก"
+            >
+              <nav className="flex flex-col py-2">
+                <Link
+                  href="/listings?listingType=sale"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-none px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  ขาย
+                </Link>
+                <Link
+                  href="/listings?listingType=rent"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-none px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  เช่า
+                </Link>
+                <Link
+                  href="/insight"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-none px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  รีวิวโครงการ
+                </Link>
+              </nav>
+            </div>
+          )}
+        </div>
         <nav className="hidden items-center gap-6 sm:flex" aria-label="หลัก">
           <Link
             href="/listings?listingType=sale"
@@ -99,22 +147,7 @@ export function Header() {
             รีวิวโครงการ
           </Link>
         </nav>
-        <div className="flex items-center gap-2 sm:gap-3" ref={mobileNavRef}>
-          <button
-            type="button"
-            onClick={() => setMobileNavOpen((o) => !o)}
-            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 sm:hidden"
-            aria-expanded={mobileNavOpen}
-            aria-label="เปิดเมนู"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-              {mobileNavOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
+        <div className="flex items-center gap-2 sm:gap-3">
           <LanguageSwitcher />
           <a
             href="https://assethub.in.th"
@@ -197,37 +230,6 @@ export function Header() {
             ))}
         </div>
       </div>
-      {mobileNavOpen && (
-        <div
-          className="absolute left-0 right-0 top-full z-40 border-b border-slate-200 bg-white shadow-lg sm:hidden"
-          role="navigation"
-          aria-label="เมนูหลัก"
-        >
-          <nav className="flex flex-col px-4 py-3">
-            <Link
-              href="/listings?listingType=sale"
-              onClick={() => setMobileNavOpen(false)}
-              className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-700 hover:bg-slate-50"
-            >
-              ขาย
-            </Link>
-            <Link
-              href="/listings?listingType=rent"
-              onClick={() => setMobileNavOpen(false)}
-              className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-700 hover:bg-slate-50"
-            >
-              เช่า
-            </Link>
-            <Link
-              href="/insight"
-              onClick={() => setMobileNavOpen(false)}
-              className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-700 hover:bg-slate-50"
-            >
-              รีวิวโครงการ
-            </Link>
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
