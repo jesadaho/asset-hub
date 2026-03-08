@@ -193,7 +193,7 @@ export default function InsightDetailPage() {
         className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         style={{ marginTop: "-20rem", marginBottom: "-2.5rem" }}
       >
-        <div className="flex min-h-[160px] w-full flex-col overflow-hidden rounded-2xl bg-slate-100 shadow-xl sm:min-h-[188px] sm:flex-row sm:items-stretch md:min-h-[204px]">
+        <div className="flex max-h-[380px] min-h-[160px] w-full flex-col overflow-hidden rounded-2xl bg-slate-100 shadow-xl sm:min-h-[188px] sm:flex-row sm:items-stretch md:min-h-[204px]">
           <div className="flex min-w-0 flex-1 flex-col justify-center px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
             <nav className="text-sm text-slate-500">
               <Link href="/insight" className="hover:text-slate-700">

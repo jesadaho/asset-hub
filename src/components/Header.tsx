@@ -61,6 +61,7 @@ export function Header() {
 
   const handleSignOut = async () => {
     setMenuOpen(false);
+    setMobileNavOpen(false);
     if (user?.provider === "line") {
       await fetch("/api/auth/signout-line", { method: "POST", credentials: "include" });
       window.location.href = "/";
@@ -123,6 +124,58 @@ export function Header() {
                 >
                   รีวิวโครงการ
                 </Link>
+                <div className="border-t border-slate-100 px-4 py-3">
+                  <div className="mb-2">
+                    <LanguageSwitcher />
+                  </div>
+                  <a
+                    href="https://assethub.in.th"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+                    style={{ backgroundColor: PRIMARY }}
+                  >
+                    ลงประกาศ
+                  </a>
+                  {!sessionLoading &&
+                    (user ? (
+                      <div className="mt-2 flex flex-col gap-0.5">
+                        {user.isAdmin && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setMobileNavOpen(false)}
+                            className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                          >
+                            Admin
+                          </Link>
+                        )}
+                        <Link
+                          href="/profile"
+                          onClick={() => setMobileNavOpen(false)}
+                          className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          โปรไฟล์
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleSignOut}
+                          className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        >
+                          ออกจากระบบ
+                        </button>
+                      </div>
+                    ) : (
+                      <Link
+                        href="/sign-in"
+                        onClick={() => setMobileNavOpen(false)}
+                        className="mt-2 inline-flex items-center rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition hover:opacity-90"
+                        style={{ borderColor: PRIMARY, color: PRIMARY }}
+                      >
+                        Sign in
+                      </Link>
+                    ))}
+                </div>
               </nav>
             </div>
           )}
@@ -147,7 +200,7 @@ export function Header() {
             รีวิวโครงการ
           </Link>
         </nav>
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="hidden items-center gap-2 sm:flex sm:gap-3">
           <LanguageSwitcher />
           <a
             href="https://assethub.in.th"
