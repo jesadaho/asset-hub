@@ -9,6 +9,20 @@ import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
 
+const yieldClasses = {
+  high: "text-green-500 font-bold", // > 7%
+  good: "text-yellow-500 font-semibold", // 6-7%
+  avg: "text-orange-400", // 4.5-6%
+  low: "text-red-500", // < 4.5%
+} as const;
+
+function getYieldLevel(y: number): keyof typeof yieldClasses {
+  if (y > 7) return "high";
+  if (y >= 6) return "good";
+  if (y >= 4.5) return "avg";
+  return "low";
+}
+
 type MarketRentEntry = { roomType: string; priceRange: string };
 
 function parseMarketRentDisplay(s: string): MarketRentEntry[] {
@@ -111,19 +125,40 @@ export default function InsightDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen">
+        <Header />
         <div
-          className="relative w-full overflow-hidden"
+          className="relative z-20 w-full overflow-hidden"
           style={{
+            height: "400px",
             background: "linear-gradient(120deg, #1b3d52 0%, #0f4c4c 50%, #0a5c5a 100%)",
             boxShadow: "inset 0 0 120px rgba(255,255,255,0.04)",
           }}
         >
-          <Header />
-          <div className="flex min-h-[40vh] items-center justify-center px-4 py-12">
-            <p className="text-white/70">กำลังโหลด...</p>
+          <div className="mx-auto flex h-full max-w-6xl flex-col px-4 pt-3 pb-5 sm:px-6 lg:px-8">
+            <div className="h-5 w-24 animate-pulse rounded bg-white/20" />
           </div>
         </div>
-        <div className="w-full flex-1 bg-white" />
+        <div
+          className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+          style={{ marginTop: "-20rem", marginBottom: "-2.5rem" }}
+        >
+          <div className="flex min-h-[200px] w-full flex-col overflow-hidden rounded-2xl bg-white shadow-xl sm:flex-row sm:items-stretch">
+            <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 px-5 py-6 sm:px-8 md:px-10">
+              <div className="h-4 w-32 animate-pulse rounded bg-slate-200" />
+              <div className="h-7 w-3/4 animate-pulse rounded bg-slate-200 sm:h-8" />
+              <div className="h-4 w-1/2 animate-pulse rounded bg-slate-200" />
+              <div className="mt-3 h-4 w-24 animate-pulse rounded bg-slate-200" />
+            </div>
+            <div className="h-32 w-full shrink-0 animate-pulse bg-slate-200 sm:h-full sm:min-h-[188px] sm:w-[48%] sm:rounded-r-2xl" />
+          </div>
+        </div>
+        <div className="mx-auto max-w-3xl px-4 pt-24 pb-12 sm:px-6 lg:px-8">
+          <div className="space-y-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="h-4 w-full animate-pulse rounded bg-slate-200" style={{ width: i === 2 ? "60%" : i === 4 ? "80%" : "100%" }} />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -288,7 +323,7 @@ export default function InsightDetailPage() {
                 {typeof data.yieldPercent === "number" && (
                   <div>
                     <span className="block text-xs text-slate-500">Rental Yield</span>
-                    <span className="text-lg font-semibold" style={{ color: PRIMARY }}>
+                    <span className={`text-lg ${yieldClasses[getYieldLevel(data.yieldPercent)]}`}>
                       {data.yieldPercent}%
                     </span>
                   </div>

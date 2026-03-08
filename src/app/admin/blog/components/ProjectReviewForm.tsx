@@ -9,6 +9,20 @@ import { MarkdownEditor } from "@/components/MarkdownEditor";
 
 const PRIMARY = "#068e7b";
 
+const yieldClasses = {
+  high: "text-green-500 font-bold", // > 7%
+  good: "text-yellow-500 font-semibold", // 6-7%
+  avg: "text-orange-400", // 4.5-6%
+  low: "text-red-500", // < 4.5%
+} as const;
+
+function getYieldLevel(y: number): keyof typeof yieldClasses {
+  if (y > 7) return "high";
+  if (y >= 6) return "good";
+  if (y >= 4.5) return "avg";
+  return "low";
+}
+
 function slugFromTitle(title: string): string {
   return title
     .trim()
@@ -1750,7 +1764,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                   {typeof yieldPercent === "number" && (
                     <div>
                       <span className="block text-xs text-slate-500">Rental Yield</span>
-                      <span className="text-lg font-semibold" style={{ color: PRIMARY }}>
+                      <span className={`text-lg ${yieldClasses[getYieldLevel(yieldPercent)]}`}>
                         {yieldPercent}%
                       </span>
                     </div>

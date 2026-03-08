@@ -100,8 +100,30 @@ export default function InsightPage() {
         )}
 
         {loading && (
-          <div className="flex min-h-[320px] items-center justify-center">
-            <p className="text-slate-500">กำลังโหลด...</p>
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div className="space-y-4 lg:col-span-2">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+                >
+                  <div className="h-40 w-[38%] shrink-0 animate-pulse bg-slate-200 sm:w-56" />
+                  <div className="flex min-w-0 flex-1 flex-col justify-center gap-2 p-4">
+                    <div className="h-3 w-3/4 animate-pulse rounded bg-slate-200" />
+                    <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200" />
+                    <div className="mt-2 h-4 w-20 animate-pulse rounded bg-slate-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <aside className="lg:col-span-1">
+              <div className="rounded-xl border border-slate-200 bg-slate-100/80 p-5">
+                <div className="h-5 w-3/4 animate-pulse rounded bg-slate-300" />
+                <div className="mt-2 h-3 w-full animate-pulse rounded bg-slate-200" />
+                <div className="mt-1 h-3 w-full animate-pulse rounded bg-slate-200" />
+                <div className="mt-4 h-10 w-32 animate-pulse rounded-lg bg-slate-300" />
+              </div>
+            </aside>
           </div>
         )}
 
