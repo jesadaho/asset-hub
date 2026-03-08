@@ -30,6 +30,8 @@ function mapPostToJson(
     out.capitalGainPercent = p.capitalGainPercent;
     out.marketRentDisplay = p.marketRentDisplay;
     out.pricePerSqm = p.pricePerSqm;
+    out.priceMin = p.priceMin;
+    out.priceMax = p.priceMax;
     out.avgRentPrice = p.avgRentPrice;
     out.occupancyRatePercent = p.occupancyRatePercent;
     out.avgDaysOnMarket = p.avgDaysOnMarket;
@@ -111,6 +113,8 @@ export async function POST(request: NextRequest) {
     capitalGainPercent?: number;
     marketRentDisplay?: string;
     pricePerSqm?: number;
+    priceMin?: number;
+    priceMax?: number;
     avgRentPrice?: number;
     occupancyRatePercent?: number;
     avgDaysOnMarket?: number;
@@ -175,6 +179,10 @@ export async function POST(request: NextRequest) {
       createPayload.marketRentDisplay = body.marketRentDisplay?.trim();
       createPayload.pricePerSqm =
         typeof body.pricePerSqm === "number" ? body.pricePerSqm : undefined;
+      createPayload.priceMin =
+        typeof body.priceMin === "number" ? body.priceMin : undefined;
+      createPayload.priceMax =
+        typeof body.priceMax === "number" ? body.priceMax : undefined;
       createPayload.avgRentPrice =
         typeof body.avgRentPrice === "number" ? body.avgRentPrice : undefined;
       createPayload.occupancyRatePercent =

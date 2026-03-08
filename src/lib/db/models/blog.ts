@@ -27,6 +27,8 @@ export interface IBlogPost {
   capitalGainPercent?: number;
   marketRentDisplay?: string;
   pricePerSqm?: number;
+  priceMin?: number;
+  priceMax?: number;
   avgRentPrice?: number; // kept for backward compat
   // 2. Project Liquidity
   occupancyRatePercent?: number;
@@ -60,6 +62,8 @@ const BlogPostSchema = new mongoose.Schema<IBlogPost>(
     capitalGainPercent: Number,
     marketRentDisplay: String,
     pricePerSqm: Number,
+    priceMin: Number,
+    priceMax: Number,
     avgRentPrice: Number,
     occupancyRatePercent: Number,
     avgDaysOnMarket: Number,

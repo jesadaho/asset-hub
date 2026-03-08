@@ -49,6 +49,17 @@ function serializeMarketRentEntries(entries: MarketRentEntry[]): string {
     .join(" | ");
 }
 
+function formatPriceRangeFromObject(pr: unknown): string {
+  if (typeof pr === "string") return pr.trim();
+  if (pr && typeof pr === "object" && "min" in pr && "max" in pr) {
+    const min = Number((pr as { min: number }).min);
+    const max = Number((pr as { max: number }).max);
+    if (!Number.isNaN(min) && !Number.isNaN(max))
+      return `${min.toLocaleString()} - ${max.toLocaleString()} THB`;
+  }
+  return "";
+}
+
 function formatRentalKey(key: string): string {
   const k = key.trim().toLowerCase();
   if (k === "studio_28sqm" || k === "studio_28") return "Studio (28 sqm)";
@@ -104,6 +115,8 @@ type PostData = {
   capitalGainPercent?: number;
   marketRentDisplay?: string;
   pricePerSqm?: number;
+  priceMin?: number;
+  priceMax?: number;
   avgRentPrice?: number;
   occupancyRatePercent?: number;
   avgDaysOnMarket?: number;
@@ -137,6 +150,8 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
   const [capitalGainPercent, setCapitalGainPercent] = useState<number | "">("");
   const [marketRentEntries, setMarketRentEntries] = useState<MarketRentEntry[]>([]);
   const [pricePerSqm, setPricePerSqm] = useState<number | "">("");
+  const [priceMin, setPriceMin] = useState<number | "">("");
+  const [priceMax, setPriceMax] = useState<number | "">("");
   const [occupancyRatePercent, setOccupancyRatePercent] = useState<
     number | ""
   >("");
@@ -151,6 +166,9 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
   const [commonFeePerSqm, setCommonFeePerSqm] = useState<number | "">("");
   const [distanceToTransit, setDistanceToTransit] = useState("");
   const [nearbyCatalyst, setNearbyCatalyst] = useState("");
+  const [district, setDistrict] = useState("");
+  const [subDistrict, setSubDistrict] = useState("");
+  const [neighborhoodTags, setNeighborhoodTags] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [metaImage, setMetaImage] = useState("");
   const [content, setContent] = useState("");
@@ -170,6 +188,9 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
   const [dataSourceTab, setDataSourceTab] = useState<"ai" | "manual">("ai");
   const [viewTab, setViewTab] = useState<"form" | "preview">("form");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const developerRef = useRef("");
+  const priceMinRef = useRef<number | "">("");
+  const priceMaxRef = useRef<number | "">("");
 
   const addImage = useCallback((key: string, url: string | null) => {
     setImageEntries((prev) => [...prev, { key, url }]);
@@ -366,7 +387,11 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
 
     if (projectInfo && typeof projectInfo === "object") {
       if (typeof projectInfo.name === "string") setProjectName(projectInfo.name.trim());
-      if (typeof projectInfo.developer === "string") setDeveloper(projectInfo.developer.trim());
+      if (typeof projectInfo.developer === "string") {
+        const d = projectInfo.developer.trim();
+        setDeveloper(d);
+        developerRef.current = d;
+      }
       if (typeof projectInfo.location === "string") setLocation(projectInfo.location.trim());
       if (projectInfo.completion_year != null) setYearBuilt(String(projectInfo.completion_year));
       if (typeof projectInfo.type === "string" && !locationContext?.nearby_catalyst) setNearbyCatalyst(projectInfo.type.trim());
@@ -380,10 +405,12 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       if (Array.isArray(marketRentArr) && marketRentArr.length > 0) {
         const entries: MarketRentEntry[] = marketRentArr
           .filter((x): x is Record<string, unknown> => x && typeof x === "object")
-          .map((x) => ({
-            roomType: typeof x.room_type === "string" ? x.room_type.trim() : "",
-            priceRange: typeof x.price_range === "string" ? x.price_range.trim() : "",
-          }));
+          .map((x) => {
+            const roomType = typeof x.room_type === "string" ? x.room_type.trim() : "";
+            const pr = x.price_range;
+            const priceRange = formatPriceRangeFromObject(pr) || (typeof pr === "string" ? pr.trim() : "");
+            return { roomType, priceRange };
+          });
         if (entries.length > 0) setMarketRentEntries(entries);
       } else {
         const rentalRange = investmentStats.rental_range;
@@ -439,15 +466,30 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       if (typeof financialPerf.capital_gain_percent === "number") setCapitalGainPercent(financialPerf.capital_gain_percent);
       if (typeof financialPerf.price_per_sqm === "number") setPricePerSqm(financialPerf.price_per_sqm);
       if (typeof financialPerf.avg_rent_price === "number") setAvgRentPrice(financialPerf.avg_rent_price);
+      const priceObj = financialPerf.price;
+      if (priceObj && typeof priceObj === "object" && !Array.isArray(priceObj)) {
+        if (typeof (priceObj as { min?: number }).min === "number") {
+          const v = (priceObj as { min: number }).min;
+          setPriceMin(v);
+          priceMinRef.current = v;
+        }
+        if (typeof (priceObj as { max?: number }).max === "number") {
+          const v = (priceObj as { max: number }).max;
+          setPriceMax(v);
+          priceMaxRef.current = v;
+        }
+      }
       const marketRent = financialPerf.market_rent;
       const rentalRange = financialPerf.rental_range;
       if (Array.isArray(marketRent) && marketRent.length > 0) {
         const entries: MarketRentEntry[] = marketRent
           .filter((x): x is Record<string, unknown> => x && typeof x === "object")
-          .map((x) => ({
-            roomType: typeof x.room_type === "string" ? x.room_type.trim() : "",
-            priceRange: typeof x.price_range === "string" ? x.price_range.trim() : "",
-          }));
+          .map((x) => {
+            const roomType = typeof x.room_type === "string" ? x.room_type.trim() : "";
+            const pr = x.price_range;
+            const priceRange = formatPriceRangeFromObject(pr) || (typeof pr === "string" ? pr.trim() : "");
+            return { roomType, priceRange };
+          });
         if (entries.length > 0) setMarketRentEntries(entries);
       } else if (rentalRange != null) {
         if (Array.isArray(rentalRange) && rentalRange.length > 0) {
@@ -490,6 +532,18 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
     if (locationData && typeof locationData === "object") {
       if (typeof locationData.transit === "string") setDistanceToTransit(locationData.transit.trim());
       if (typeof locationData.catalyst === "string") setNearbyCatalyst(locationData.catalyst.trim());
+      const dist = typeof locationData.district === "string" ? locationData.district.trim() : "";
+      const subDist = typeof locationData.sub_district === "string" ? locationData.sub_district.trim() : "";
+      setDistrict(dist);
+      setSubDistrict(subDist);
+      if (dist || subDist) {
+        const locParts = [subDist, dist].filter(Boolean);
+        if (locParts.length) setLocation(locParts.join(", "));
+      }
+      const tags = locationData.neighborhood_tags;
+      if (Array.isArray(tags) && tags.length > 0) {
+        setNeighborhoodTags(tags.map((t) => String(t).trim()).filter(Boolean).join(", "));
+      }
     }
 
     if (locationContext && typeof locationContext === "object") {
@@ -558,7 +612,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       if (mode === "create") setLoading(false);
       return;
     }
-    fetch(`/api/admin/blog/${id}`, { credentials: "include" })
+    fetch(`/api/admin/blog/${id}`, { credentials: "include", cache: "no-store" })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load");
         return res.json();
@@ -567,7 +621,9 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
         setTitle(data.title ?? "");
         setSlug(data.slug ?? "");
         setProjectName(data.projectName ?? "");
-        setDeveloper(data.developer ?? "");
+        const devStr = data.developer ?? "";
+        setDeveloper(devStr);
+        developerRef.current = devStr;
         setLocation(data.location ?? "");
         setYearBuilt(
           data.yearBuilt !== undefined && data.yearBuilt !== null
@@ -589,6 +645,12 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
         setPricePerSqm(
           typeof data.pricePerSqm === "number" ? data.pricePerSqm : ""
         );
+        const pMinVal = typeof data.priceMin === "number" ? data.priceMin : "";
+        const pMaxVal = typeof data.priceMax === "number" ? data.priceMax : "";
+        setPriceMin(pMinVal);
+        setPriceMax(pMaxVal);
+        priceMinRef.current = pMinVal;
+        priceMaxRef.current = pMaxVal;
         setOccupancyRatePercent(
           typeof data.occupancyRatePercent === "number"
             ? data.occupancyRatePercent
@@ -618,7 +680,24 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
           typeof data.commonFeePerSqm === "number" ? data.commonFeePerSqm : ""
         );
         setDistanceToTransit(data.distanceToTransit ?? "");
-        setNearbyCatalyst(data.nearbyCatalyst ?? "");
+        const savedCatalyst = data.nearbyCatalyst ?? "";
+        if (savedCatalyst.includes(" · ")) {
+          const idx = savedCatalyst.indexOf(" · ");
+          setNearbyCatalyst(savedCatalyst.slice(0, idx).trim());
+          setNeighborhoodTags(savedCatalyst.slice(idx + 3).trim());
+        } else {
+          setNearbyCatalyst(savedCatalyst);
+          setNeighborhoodTags("");
+        }
+        setDistrict("");
+        setSubDistrict("");
+        if (typeof data.location === "string" && data.location.includes(", ")) {
+          const parts = data.location.split(",").map((s) => s.trim());
+          if (parts.length >= 2) {
+            setSubDistrict(parts[0] ?? "");
+            setDistrict(parts[1] ?? "");
+          }
+        }
         setMetaDescription(data.metaDescription ?? "");
         setMetaImage(data.metaImage ?? "");
         const { main, pros: loadedPros, cons: loadedCons } = parseContentProsCons(data.content ?? "");
@@ -657,6 +736,11 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       setError("กรุณากรอกชื่อเรื่อง");
       return;
     }
+    const dev = developerRef.current.trim();
+    const pMin = priceMinRef.current;
+    const pMax = priceMaxRef.current;
+    const numPriceMin = typeof pMin === "number" && !Number.isNaN(pMin) ? pMin : undefined;
+    const numPriceMax = typeof pMax === "number" && !Number.isNaN(pMax) ? pMax : undefined;
     setSubmitting(true);
     const payload = {
       type: "project_review" as const,
@@ -665,14 +749,16 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       content: buildContentWithProsCons(content, pros, cons),
       status,
       projectName: projectName.trim(),
-      developer: developer.trim(),
-      location: location.trim(),
+      developer: dev,
+      location: (subDistrict || district) ? [subDistrict, district].filter(Boolean).join(", ") : location.trim(),
       yearBuilt: yearBuilt.trim() || undefined,
       yieldPercent: typeof yieldPercent === "number" ? yieldPercent : undefined,
       capitalGainPercent:
         typeof capitalGainPercent === "number" ? capitalGainPercent : undefined,
       marketRentDisplay: serializeMarketRentEntries(marketRentEntries) || undefined,
       pricePerSqm: typeof pricePerSqm === "number" ? pricePerSqm : undefined,
+      priceMin: numPriceMin,
+      priceMax: numPriceMax,
       avgRentPrice: typeof avgRentPrice === "number" ? avgRentPrice : undefined,
       occupancyRatePercent:
         typeof occupancyRatePercent === "number"
@@ -695,27 +781,30 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       commonFeePerSqm:
         typeof commonFeePerSqm === "number" ? commonFeePerSqm : undefined,
       distanceToTransit: distanceToTransit.trim() || undefined,
-      nearbyCatalyst: nearbyCatalyst.trim() || undefined,
+      nearbyCatalyst: [nearbyCatalyst.trim(), neighborhoodTags.trim()].filter(Boolean).join(" · ") || undefined,
       metaDescription: metaDescription.trim() || undefined,
       metaImage: metaImage.trim() || undefined,
       imageKeys: imageEntries.map((e) => e.key),
     };
     const url = mode === "edit" && id ? `/api/admin/blog/${id}` : "/api/admin/blog";
     const method = mode === "edit" && id ? "PATCH" : "POST";
-    const res = await fetch(url, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(data.message ?? "เกิดข้อผิดพลาด");
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.message ?? "เกิดข้อผิดพลาด");
+        return;
+      }
+      router.push("/admin/blog");
+      router.refresh();
+    } finally {
       setSubmitting(false);
-      return;
     }
-    router.push("/admin/blog");
-    router.refresh();
   }
 
   if (loading) {
@@ -857,9 +946,14 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
               <div>
                 <label className="block text-xs text-slate-500">นักพัฒนา</label>
                 <input
+                  name="developer"
                   type="text"
                   value={developer}
-                  onChange={(e) => setDeveloper(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setDeveloper(v);
+                    developerRef.current = v;
+                  }}
                   className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                   placeholder="เช่น Ananda Development"
                 />
@@ -1108,6 +1202,48 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                 </div>
               </div>
               <div>
+                <label className="block text-xs text-slate-500">Price (min) THB</label>
+                <div className="mt-1 flex rounded-lg border border-slate-300 bg-white">
+                  <input
+                    name="priceMin"
+                    type="number"
+                    step="1"
+                    value={priceMin === "" ? "" : priceMin}
+                    onChange={(e) => {
+                      const v = e.target.value === "" ? "" : Number(e.target.value);
+                      setPriceMin(v);
+                      priceMinRef.current = v;
+                    }}
+                    placeholder="เช่น 3900000"
+                    className="w-full rounded-l-lg px-3 py-2 text-sm text-slate-900"
+                  />
+                  <span className="flex items-center rounded-r-lg bg-slate-100 px-2 text-sm text-slate-500">
+                    THB
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500">Price (max) THB</label>
+                <div className="mt-1 flex rounded-lg border border-slate-300 bg-white">
+                  <input
+                    name="priceMax"
+                    type="number"
+                    step="1"
+                    value={priceMax === "" ? "" : priceMax}
+                    onChange={(e) => {
+                      const v = e.target.value === "" ? "" : Number(e.target.value);
+                      setPriceMax(v);
+                      priceMaxRef.current = v;
+                    }}
+                    placeholder="เช่น 9000000"
+                    className="w-full rounded-l-lg px-3 py-2 text-sm text-slate-900"
+                  />
+                  <span className="flex items-center rounded-r-lg bg-slate-100 px-2 text-sm text-slate-500">
+                    THB
+                  </span>
+                </div>
+              </div>
+              <div>
                 <label className="block text-xs text-slate-500">
                   ราคาปล่อยเช่าเฉลี่ย
                 </label>
@@ -1277,6 +1413,34 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
+                <label className="block text-xs text-slate-500">เขต (District)</label>
+                <input
+                  type="text"
+                  value={district}
+                  onChange={(e) => {
+                    setDistrict(e.target.value);
+                    if (!subDistrict && !e.target.value) setLocation((l) => l);
+                    else setLocation([subDistrict, e.target.value].filter(Boolean).join(", "));
+                  }}
+                  placeholder="เช่น พระโขนง"
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500">แขวง (Sub-district)</label>
+                <input
+                  type="text"
+                  value={subDistrict}
+                  onChange={(e) => {
+                    setSubDistrict(e.target.value);
+                    if (!district && !e.target.value) setLocation((l) => l);
+                    else setLocation([e.target.value, district].filter(Boolean).join(", "));
+                  }}
+                  placeholder="เช่น บางจาก"
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <label className="block text-xs text-slate-500">
                   Distance to Transit
                 </label>
@@ -1284,19 +1448,31 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                   type="text"
                   value={distanceToTransit}
                   onChange={(e) => setDistanceToTransit(e.target.value)}
-                  placeholder="เช่น 500m หรือ 5 นาที"
+                  placeholder="เช่น 0m to BTS Bang Chak"
                   className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-xs text-slate-500">
-                  Nearby Catalyst
+                  Nearby Catalyst (จุดดึงดูด)
                 </label>
                 <input
                   type="text"
                   value={nearbyCatalyst}
                   onChange={(e) => setNearbyCatalyst(e.target.value)}
-                  placeholder="สถานที่สำคัญใกล้ๆ ที่กำลังจะเปิด"
+                  placeholder="เช่น Starbucks & MaxValu Under Building, Bang Chak Market"
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs text-slate-500">
+                  Neighborhood tags (คั่นด้วย comma)
+                </label>
+                <input
+                  type="text"
+                  value={neighborhoodTags}
+                  onChange={(e) => setNeighborhoodTags(e.target.value)}
+                  placeholder="เช่น Sukhumvit-Late, BTS-BangChak, High-Rise-Living"
                   className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
@@ -1513,6 +1689,53 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
               )}
             </div>
 
+            {/* ข้อมูลโครงการ (รวม location ใหม่: ทำเล, Transit, Catalyst) */}
+            {(developer || location || yearBuilt || distanceToTransit || nearbyCatalyst || neighborhoodTags) && (
+              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  ข้อมูลโครงการ
+                </p>
+                <div className="space-y-2 text-sm text-slate-700">
+                  {developer && (
+                    <p>
+                      <span className="text-slate-500">นักพัฒนา: </span>
+                      <span style={{ color: PRIMARY }}>{developer}</span>
+                    </p>
+                  )}
+                  {location && (
+                    <p>
+                      <span className="text-slate-500">ทำเล: </span>
+                      <span style={{ color: PRIMARY }}>{location}</span>
+                    </p>
+                  )}
+                  {yearBuilt && (
+                    <p>
+                      <span className="text-slate-500">ปีที่สร้าง: </span>
+                      <span style={{ color: PRIMARY }}>{yearBuilt}</span>
+                    </p>
+                  )}
+                  {distanceToTransit && (
+                    <p>
+                      <span className="text-slate-500">ระยะทาง BTS/Transit: </span>
+                      <span style={{ color: PRIMARY }}>{distanceToTransit}</span>
+                    </p>
+                  )}
+                  {nearbyCatalyst && (
+                    <p>
+                      <span className="text-slate-500">จุดดึงดูด (Catalyst): </span>
+                      <span style={{ color: PRIMARY }}>{nearbyCatalyst}</span>
+                    </p>
+                  )}
+                  {neighborhoodTags && (
+                    <p>
+                      <span className="text-slate-500">Neighborhood tags: </span>
+                      <span style={{ color: PRIMARY }}>{neighborhoodTags}</span>
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Financial — card + grid */}
             {(typeof yieldPercent === "number" ||
               typeof capitalGainPercent === "number" ||
@@ -1548,6 +1771,18 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                       </span>
                     </div>
                   )}
+                  <div>
+                    <span className="block text-xs text-slate-500">ช่วงราคา (Price)</span>
+                    <span className="text-lg font-semibold" style={{ color: PRIMARY }}>
+                      {typeof priceMin === "number" && typeof priceMax === "number"
+                        ? `${priceMin.toLocaleString()} - ${priceMax.toLocaleString()} THB`
+                        : typeof priceMin === "number"
+                          ? `${priceMin.toLocaleString()}+ THB`
+                          : typeof priceMax === "number"
+                            ? `ถึง ${priceMax.toLocaleString()} THB`
+                            : "—"}
+                    </span>
+                  </div>
                   {typeof avgRentPrice === "number" && (
                     <div>
                       <span className="block text-xs text-slate-500">ราคาปล่อยเช่าเฉลี่ย</span>
@@ -1649,28 +1884,6 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
               </div>
             )}
 
-            {/* Location — card โทนต่าง */}
-            {(distanceToTransit || nearbyCatalyst) && (
-              <div className="rounded-xl border border-slate-200 bg-slate-50/90 p-4">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Location
-                </p>
-                <div className="space-y-2 text-sm text-slate-700">
-                  {distanceToTransit && (
-                    <p>
-                      <span className="text-slate-500">Transit: </span>
-                      <span style={{ color: PRIMARY }}>{distanceToTransit}</span>
-                    </p>
-                  )}
-                  {nearbyCatalyst && (
-                    <p>
-                      <span className="text-slate-500">Catalyst: </span>
-                      <span style={{ color: PRIMARY }}>{nearbyCatalyst}</span>
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
             {content && (
               <div className="prose prose-sm max-w-none prose-p:text-slate-700 [&_br]:block [&>*]:mb-4 [&>*:last-child]:mb-0 [&_h1]:mt-0 [&_h2]:mt-0 [&_h3]:mt-0">
                 <ReactMarkdown remarkPlugins={[remarkBreaks]}>

@@ -44,6 +44,8 @@ type InsightDetail = {
   capitalGainPercent?: number;
   marketRentDisplay?: string;
   pricePerSqm?: number;
+  priceMin?: number;
+  priceMax?: number;
   avgRentPrice?: number;
   occupancyRatePercent?: number;
   avgDaysOnMarket?: number;
@@ -163,17 +165,7 @@ export default function InsightDetailPage() {
   return (
     <div className="min-h-screen">
       <Header />
-      {/* ปุ่ม back สำหรับ mobile: sticky ให้เห็นตลอด */}
-      <div className="sticky top-14 z-30 flex justify-start border-b border-white/10 bg-[#0f4c4c] px-4 py-2 sm:hidden">
-        <Link
-          href="/insight"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-white/90 hover:text-white"
-        >
-          <span aria-hidden>←</span>
-          กลับไป Insight
-        </Link>
-      </div>
-      {/* Zone บน: BG สีเขียว สูง 400px */}
+      {/* Zone บน: BG สีเขียว — ปุ่มกลับอยู่ระหว่าง topbar กับการ์ด */}
       <div
         className="relative z-20 w-full overflow-hidden"
         style={{
@@ -182,11 +174,12 @@ export default function InsightDetailPage() {
           boxShadow: "inset 0 0 120px rgba(255,255,255,0.04)",
         }}
       >
-        <div className="mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-5 pt-2 sm:px-6 lg:px-8">
-          <div>
+        <div className="mx-auto flex h-full max-w-6xl flex-col px-4 pt-3 pb-5 sm:px-6 lg:px-8">
+          <div className="flex-shrink-0">
             <Link
               href="/insight"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 hover:text-white"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-white/90 hover:text-white"
+              aria-label="กลับไป Insight"
             >
               <span aria-hidden>←</span>
               กลับไป Insight
@@ -252,6 +245,35 @@ export default function InsightDetailPage() {
               </p>
             )}
 
+          {/* ข้อมูลโครงการ: นักพัฒนา, ทำเล, ปีที่สร้าง */}
+          {(data.developer || data.location || data.yearBuilt) && (
+            <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                ข้อมูลโครงการ
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {data.developer && (
+                  <div>
+                    <span className="block text-xs text-slate-500">นักพัฒนา</span>
+                    <span className="text-sm font-medium text-slate-800">{data.developer}</span>
+                  </div>
+                )}
+                {data.location && (
+                  <div>
+                    <span className="block text-xs text-slate-500">ทำเล</span>
+                    <span className="text-sm text-slate-800">{data.location}</span>
+                  </div>
+                )}
+                {data.yearBuilt != null && data.yearBuilt !== "" && (
+                  <div>
+                    <span className="block text-xs text-slate-500">ปีที่สร้าง</span>
+                    <span className="text-sm text-slate-800">{String(data.yearBuilt)}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Financial */}
           {(typeof data.yieldPercent === "number" ||
             typeof data.capitalGainPercent === "number" ||
@@ -287,6 +309,18 @@ export default function InsightDetailPage() {
                     </span>
                   </div>
                 )}
+                <div>
+                  <span className="block text-xs text-slate-500">ช่วงราคา (Price)</span>
+                  <span className="text-lg font-semibold" style={{ color: PRIMARY }}>
+                    {typeof data.priceMin === "number" && typeof data.priceMax === "number"
+                      ? `${data.priceMin.toLocaleString()} - ${data.priceMax.toLocaleString()} THB`
+                      : typeof data.priceMin === "number"
+                        ? `${data.priceMin.toLocaleString()}+ THB`
+                        : typeof data.priceMax === "number"
+                          ? `ถึง ${data.priceMax.toLocaleString()} THB`
+                          : "—"}
+                  </span>
+                </div>
                 {typeof data.avgRentPrice === "number" && (
                   <div>
                     <span className="block text-xs text-slate-500">ราคาปล่อยเช่าเฉลี่ย</span>

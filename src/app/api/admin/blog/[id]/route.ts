@@ -28,6 +28,8 @@ function mapPostToJson(
     capitalGainPercent: p.capitalGainPercent,
     marketRentDisplay: p.marketRentDisplay,
     pricePerSqm: p.pricePerSqm,
+    priceMin: p.priceMin,
+    priceMax: p.priceMax,
     avgRentPrice: p.avgRentPrice,
     occupancyRatePercent: p.occupancyRatePercent,
     avgDaysOnMarket: p.avgDaysOnMarket,
@@ -99,6 +101,8 @@ export async function PATCH(
     capitalGainPercent?: number;
     marketRentDisplay?: string;
     pricePerSqm?: number;
+    priceMin?: number;
+    priceMax?: number;
     avgRentPrice?: number;
     occupancyRatePercent?: number;
     avgDaysOnMarket?: number;
@@ -118,63 +122,63 @@ export async function PATCH(
 
   try {
     await connectDB();
-    const post = await BlogPost.findById(id);
-    if (!post) {
+    const existing = await BlogPost.findById(id);
+    if (!existing) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
-    if (body.title !== undefined) post.title = body.title.trim() || post.title;
-    if (body.slug !== undefined) post.slug = body.slug.trim() || post.slug;
-    if (typeof body.content === "string") post.content = body.content;
-    if (body.status === "published" || body.status === "draft")
-      post.status = body.status;
-    if (body.metaDescription !== undefined)
-      post.metaDescription = body.metaDescription?.trim() ?? "";
-    if (body.metaImage !== undefined)
-      post.metaImage = body.metaImage?.trim() ?? "";
-    if (body.type === "project_review" || body.type === "article")
-      post.type = body.type;
-    if (post.type === "project_review") {
-      if (body.projectName !== undefined)
-        post.projectName = body.projectName?.trim();
-      if (body.developer !== undefined) post.developer = body.developer?.trim();
-      if (body.location !== undefined) post.location = body.location?.trim();
-      if (body.yearBuilt !== undefined) post.yearBuilt = body.yearBuilt;
-      if (typeof body.yieldPercent === "number")
-        post.yieldPercent = body.yieldPercent;
-      if (typeof body.capitalGainPercent === "number")
-        post.capitalGainPercent = body.capitalGainPercent;
-      if (body.marketRentDisplay !== undefined)
-        post.marketRentDisplay = body.marketRentDisplay?.trim();
-      if (typeof body.pricePerSqm === "number")
-        post.pricePerSqm = body.pricePerSqm;
-      if (typeof body.avgRentPrice === "number")
-        post.avgRentPrice = body.avgRentPrice;
-      if (typeof body.occupancyRatePercent === "number")
-        post.occupancyRatePercent = body.occupancyRatePercent;
-      if (typeof body.avgDaysOnMarket === "number")
-        post.avgDaysOnMarket = body.avgDaysOnMarket;
+
+    const update: Record<string, unknown> = {};
+    if (body.title !== undefined) update.title = body.title.trim() || existing.title;
+    if (body.slug !== undefined) update.slug = body.slug.trim() || existing.slug;
+    if (typeof body.content === "string") update.content = body.content;
+    if (body.status === "published" || body.status === "draft") update.status = body.status;
+    if (body.metaDescription !== undefined) update.metaDescription = body.metaDescription?.trim() ?? "";
+    if (body.metaImage !== undefined) update.metaImage = body.metaImage?.trim() ?? "";
+    if (body.type === "project_review" || body.type === "article") update.type = body.type;
+
+    const isProjectReview =
+      existing.type === "project_review" || body.type === "project_review";
+    if (isProjectReview) {
+      if (body.projectName !== undefined) update.projectName = body.projectName?.trim();
+      if (body.developer !== undefined) update.developer = (body.developer ?? "").toString().trim();
+      if (body.location !== undefined) update.location = body.location?.trim();
+      if (body.yearBuilt !== undefined) update.yearBuilt = body.yearBuilt;
+      if (typeof body.yieldPercent === "number") update.yieldPercent = body.yieldPercent;
+      if (typeof body.capitalGainPercent === "number") update.capitalGainPercent = body.capitalGainPercent;
+      if (body.marketRentDisplay !== undefined) update.marketRentDisplay = body.marketRentDisplay?.trim();
+      if (typeof body.pricePerSqm === "number") update.pricePerSqm = body.pricePerSqm;
+      if (body.priceMin !== undefined && body.priceMin !== null) {
+        const v = typeof body.priceMin === "number" ? body.priceMin : Number(body.priceMin);
+        if (!Number.isNaN(v)) update.priceMin = v;
+      }
+      if (body.priceMax !== undefined && body.priceMax !== null) {
+        const v = typeof body.priceMax === "number" ? body.priceMax : Number(body.priceMax);
+        if (!Number.isNaN(v)) update.priceMax = v;
+      }
+      if (typeof body.avgRentPrice === "number") update.avgRentPrice = body.avgRentPrice;
+      if (typeof body.occupancyRatePercent === "number") update.occupancyRatePercent = body.occupancyRatePercent;
+      if (typeof body.avgDaysOnMarket === "number") update.avgDaysOnMarket = body.avgDaysOnMarket;
       if (
         body.demandScore === "high" ||
         body.demandScore === "medium" ||
         body.demandScore === "low"
       )
-        post.demandScore = body.demandScore;
-      if (typeof body.managementQuality === "number")
-        post.managementQuality = body.managementQuality;
-      if (typeof body.parkingRatioPercent === "number")
-        post.parkingRatioPercent = body.parkingRatioPercent;
-      if (typeof body.commonFeePerSqm === "number")
-        post.commonFeePerSqm = body.commonFeePerSqm;
-      if (body.distanceToTransit !== undefined)
-        post.distanceToTransit = body.distanceToTransit?.trim();
-      if (body.nearbyCatalyst !== undefined)
-        post.nearbyCatalyst = body.nearbyCatalyst?.trim();
-      if (Array.isArray(body.imageKeys)) post.imageKeys = body.imageKeys;
+        update.demandScore = body.demandScore;
+      if (typeof body.managementQuality === "number") update.managementQuality = body.managementQuality;
+      if (typeof body.parkingRatioPercent === "number") update.parkingRatioPercent = body.parkingRatioPercent;
+      if (typeof body.commonFeePerSqm === "number") update.commonFeePerSqm = body.commonFeePerSqm;
+      if (body.distanceToTransit !== undefined) update.distanceToTransit = body.distanceToTransit?.trim();
+      if (body.nearbyCatalyst !== undefined) update.nearbyCatalyst = body.nearbyCatalyst?.trim();
+      if (Array.isArray(body.imageKeys)) update.imageKeys = body.imageKeys;
     }
-    await post.save();
-    const saved = post.toObject() as IBlogPost & {
-      _id: mongoose.Types.ObjectId;
-    };
+
+    const oid = new mongoose.Types.ObjectId(id);
+    await BlogPost.collection.updateOne({ _id: oid }, { $set: update });
+    const updated = await BlogPost.findById(id).lean().exec();
+    if (!updated) {
+      return NextResponse.json({ message: "Not found" }, { status: 404 });
+    }
+    const saved = updated as IBlogPost & { _id: mongoose.Types.ObjectId };
     return NextResponse.json(mapPostToJson(saved));
   } catch (err) {
     console.error("[PATCH /api/admin/blog/[id]]", err);

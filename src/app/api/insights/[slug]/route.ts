@@ -69,6 +69,8 @@ function mapDetailToJson(
     capitalGainPercent: p.capitalGainPercent,
     marketRentDisplay: p.marketRentDisplay,
     pricePerSqm: p.pricePerSqm,
+    priceMin: p.priceMin,
+    priceMax: p.priceMax,
     avgRentPrice: p.avgRentPrice,
     occupancyRatePercent: p.occupancyRatePercent,
     avgDaysOnMarket: p.avgDaysOnMarket,
