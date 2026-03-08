@@ -97,6 +97,7 @@ type PostData = {
   status: string;
   type?: string;
   projectName?: string;
+  developer?: string;
   location?: string;
   yearBuilt?: number | string;
   yieldPercent?: number;
@@ -128,6 +129,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [projectName, setProjectName] = useState("");
+  const [developer, setDeveloper] = useState("");
   const [location, setLocation] = useState("");
   const [yearBuilt, setYearBuilt] = useState<string>("");
   const [yieldPercent, setYieldPercent] = useState<number | "">("");
@@ -364,6 +366,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
 
     if (projectInfo && typeof projectInfo === "object") {
       if (typeof projectInfo.name === "string") setProjectName(projectInfo.name.trim());
+      if (typeof projectInfo.developer === "string") setDeveloper(projectInfo.developer.trim());
       if (typeof projectInfo.location === "string") setLocation(projectInfo.location.trim());
       if (projectInfo.completion_year != null) setYearBuilt(String(projectInfo.completion_year));
       if (typeof projectInfo.type === "string" && !locationContext?.nearby_catalyst) setNearbyCatalyst(projectInfo.type.trim());
@@ -437,6 +440,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       if (typeof financialPerf.price_per_sqm === "number") setPricePerSqm(financialPerf.price_per_sqm);
       if (typeof financialPerf.avg_rent_price === "number") setAvgRentPrice(financialPerf.avg_rent_price);
       const marketRent = financialPerf.market_rent;
+      const rentalRange = financialPerf.rental_range;
       if (Array.isArray(marketRent) && marketRent.length > 0) {
         const entries: MarketRentEntry[] = marketRent
           .filter((x): x is Record<string, unknown> => x && typeof x === "object")
@@ -445,6 +449,28 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
             priceRange: typeof x.price_range === "string" ? x.price_range.trim() : "",
           }));
         if (entries.length > 0) setMarketRentEntries(entries);
+      } else if (rentalRange != null) {
+        if (Array.isArray(rentalRange) && rentalRange.length > 0) {
+          const entries: MarketRentEntry[] = rentalRange
+            .filter((x): x is Record<string, unknown> => x && typeof x === "object")
+            .map((x) => ({
+              roomType: typeof x.room_type === "string" ? x.room_type.trim() : "",
+              priceRange: typeof x.price_range === "string" ? x.price_range.trim() : "",
+            }));
+          if (entries.length > 0) setMarketRentEntries(entries);
+        } else if (typeof rentalRange === "object" && !Array.isArray(rentalRange)) {
+          const entries: MarketRentEntry[] = Object.entries(
+            rentalRange as Record<string, unknown>
+          )
+            .filter(([, v]) => typeof v === "string")
+            .map(([k, v]) => ({
+              roomType: formatRentalKey(k),
+              priceRange: String(v),
+            }));
+          if (entries.length > 0) setMarketRentEntries(entries);
+        } else if (typeof rentalRange === "string") {
+          setMarketRentEntries(parseMarketRentDisplay(rentalRange));
+        }
       }
     }
     if (liquidity && typeof liquidity === "object") {
@@ -541,6 +567,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
         setTitle(data.title ?? "");
         setSlug(data.slug ?? "");
         setProjectName(data.projectName ?? "");
+        setDeveloper(data.developer ?? "");
         setLocation(data.location ?? "");
         setYearBuilt(
           data.yearBuilt !== undefined && data.yearBuilt !== null
@@ -638,6 +665,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       content: buildContentWithProsCons(content, pros, cons),
       status,
       projectName: projectName.trim(),
+      developer: developer.trim(),
       location: location.trim(),
       yearBuilt: yearBuilt.trim() || undefined,
       yieldPercent: typeof yieldPercent === "number" ? yieldPercent : undefined,
@@ -824,6 +852,16 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
                   className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500">นักพัฒนา</label>
+                <input
+                  type="text"
+                  value={developer}
+                  onChange={(e) => setDeveloper(e.target.value)}
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                  placeholder="เช่น Ananda Development"
                 />
               </div>
               <div>
@@ -1173,11 +1211,13 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                   type="number"
                   min={1}
                   max={5}
+                  step="0.1"
                   value={managementQuality === "" ? "" : managementQuality}
                   onChange={(e) => {
                     const v = e.target.value;
+                    const n = Number(v);
                     setManagementQuality(
-                      v === "" ? "" : Math.min(5, Math.max(1, Number(v)))
+                      v === "" ? "" : (Number.isFinite(n) ? Math.min(5, Math.max(1, n)) : "")
                     );
                   }}
                   className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"

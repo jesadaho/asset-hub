@@ -62,6 +62,7 @@ function mapDetailToJson(
     metaDescription: p.metaDescription,
     metaImage: metaImageUrl ?? undefined,
     projectName: p.projectName,
+    developer: p.developer,
     location: p.location,
     yearBuilt: p.yearBuilt,
     yieldPercent: p.yieldPercent,

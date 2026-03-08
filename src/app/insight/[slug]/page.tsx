@@ -36,6 +36,7 @@ type InsightDetail = {
   title: string;
   content: string;
   projectName?: string;
+  developer?: string;
   location?: string;
   yearBuilt?: number | string;
   metaImage?: string;
@@ -171,8 +172,8 @@ export default function InsightDetailPage() {
           boxShadow: "inset 0 0 120px rgba(255,255,255,0.04)",
         }}
       >
-        <div className="mx-auto max-w-6xl px-4 pt-2 pb-0 sm:px-6 lg:px-8">
-          <div className="mb-4">
+        <div className="mx-auto flex h-full max-w-6xl flex-col justify-end px-4 pb-5 pt-2 sm:px-6 lg:px-8">
+          <div>
             <Link
               href="/insight"
               className="inline-flex items-center gap-1.5 text-sm font-medium text-white/80 hover:text-white"
@@ -203,9 +204,9 @@ export default function InsightDetailPage() {
             <h1 className="mt-2 text-2xl font-bold leading-tight text-slate-900 sm:text-3xl md:text-4xl">
               {data.title || data.projectName}
             </h1>
-            {(data.location || data.yearBuilt) && (
+            {(data.developer || data.location || data.yearBuilt) && (
               <p className="mt-1.5 text-sm text-slate-600">
-                {[data.location, data.yearBuilt].filter(Boolean).join(" · ")}
+                {[data.developer, data.location, data.yearBuilt].filter(Boolean).join(" · ")}
               </p>
             )}
             <p className="mt-4 text-sm font-medium" style={{ color: PRIMARY }}>

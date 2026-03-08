@@ -26,7 +26,7 @@ function InsightCardRow({ item }: { item: InsightItem }) {
 
   const cardContent = (
     <>
-      <div className="h-36 w-48 shrink-0 bg-slate-200 sm:h-40 sm:w-56">
+      <div className="w-[38%] shrink-0 overflow-hidden bg-slate-200 aspect-square sm:aspect-auto sm:h-40 sm:w-56">
         {item.metaImage ? (
           <img
             src={item.metaImage}
@@ -39,8 +39,9 @@ function InsightCardRow({ item }: { item: InsightItem }) {
           </div>
         )}
       </div>
-      <div className="flex min-w-0 flex-1 flex-col justify-center p-4">
-        <p className="font-semibold text-slate-900 line-clamp-2 group-hover:underline">
+      <div className="flex min-w-0 flex-1 flex-col justify-center py-3 pr-3 pl-3 sm:p-4">
+        <p className="text-xs text-slate-500 sm:hidden">รีวิวโครงการ</p>
+        <p className="mt-0.5 font-semibold text-slate-900 line-clamp-2 group-hover:underline sm:mt-0 sm:line-clamp-2">
           {headline}
         </p>
         <span
@@ -85,10 +86,10 @@ export default function InsightPage() {
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            Insight (รีวิวฉบับนักลงทุน)
+            รีวิวบ้านและคอนโดทั่วประเทศ
           </h1>
           <p className="mt-2 text-slate-600">
-            รีวิวฉบับนักลงทุน ข้อมูลจริงจากคนลงทุนจริง
+            รีวิวบ้านและคอนโดทั่วประเทศ เจาะลึกด้วยข้อมูลสถิติการลงทุน Rental Yield จริงจากหน้างาน และวิเคราะห์สภาพคล่องรายโครงการ เพื่อเป็นเครื่องมือสำคัญในการตัดสินใจลงทุนของคุณ
           </p>
         </div>
 
@@ -108,7 +109,7 @@ export default function InsightPage() {
           <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
             <p className="font-medium text-slate-700">ยังไม่มีรีวิว</p>
             <p className="mt-1 text-sm text-slate-500">
-              รีวิวฉบับนักลงทุนจะแสดงที่นี่เมื่อมีโพสต์ที่เผยแพร่แล้ว
+              รีวิวโครงการจะแสดงที่นี่เมื่อมีโพสต์ที่เผยแพร่แล้ว
             </p>
           </div>
         )}

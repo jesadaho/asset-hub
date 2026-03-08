@@ -19,6 +19,7 @@ export interface IBlogPost {
   updatedAt?: Date;
   // project_review only
   projectName?: string;
+  developer?: string;
   location?: string;
   yearBuilt?: number | string;
   // 1. Financial Performance
@@ -52,6 +53,7 @@ const BlogPostSchema = new mongoose.Schema<IBlogPost>(
     metaDescription: String,
     metaImage: String,
     projectName: String,
+    developer: String,
     location: String,
     yearBuilt: mongoose.Schema.Types.Mixed,
     yieldPercent: Number,

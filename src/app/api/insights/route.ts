@@ -32,6 +32,7 @@ function mapInsightListItem(
     slug: p.slug,
     title: p.title,
     projectName: p.projectName,
+    developer: p.developer,
     metaDescription: p.metaDescription,
     metaImage: metaImageUrl ?? undefined,
     location: p.location,

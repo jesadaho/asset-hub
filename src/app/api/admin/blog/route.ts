@@ -23,6 +23,7 @@ function mapPostToJson(
   };
   if (p.type === "project_review") {
     out.projectName = p.projectName;
+    out.developer = p.developer;
     out.location = p.location;
     out.yearBuilt = p.yearBuilt;
     out.yieldPercent = p.yieldPercent;
@@ -103,6 +104,7 @@ export async function POST(request: NextRequest) {
     metaDescription?: string;
     metaImage?: string;
     projectName?: string;
+    developer?: string;
     location?: string;
     yearBuilt?: number | string;
     yieldPercent?: number;
@@ -161,6 +163,7 @@ export async function POST(request: NextRequest) {
       createPayload.metaImage = body.metaImage.trim();
     if (type === "project_review") {
       createPayload.projectName = body.projectName?.trim();
+      createPayload.developer = body.developer?.trim();
       createPayload.location = body.location?.trim();
       createPayload.yearBuilt = body.yearBuilt;
       createPayload.yieldPercent =

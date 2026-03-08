@@ -21,6 +21,7 @@ function mapPostToJson(
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
     projectName: p.projectName,
+    developer: p.developer,
     location: p.location,
     yearBuilt: p.yearBuilt,
     yieldPercent: p.yieldPercent,
@@ -91,6 +92,7 @@ export async function PATCH(
     metaDescription?: string;
     metaImage?: string;
     projectName?: string;
+    developer?: string;
     location?: string;
     yearBuilt?: number | string;
     yieldPercent?: number;
@@ -134,6 +136,7 @@ export async function PATCH(
     if (post.type === "project_review") {
       if (body.projectName !== undefined)
         post.projectName = body.projectName?.trim();
+      if (body.developer !== undefined) post.developer = body.developer?.trim();
       if (body.location !== undefined) post.location = body.location?.trim();
       if (body.yearBuilt !== undefined) post.yearBuilt = body.yearBuilt;
       if (typeof body.yieldPercent === "number")
