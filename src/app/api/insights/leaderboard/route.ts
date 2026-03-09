@@ -23,7 +23,7 @@ async function resolveDisplayImageUrl(
   return null;
 }
 
-const MAX_LEADERBOARD = 100;
+const MAX_LEADERBOARD = 50;
 
 function mapLeaderboardItem(
   p: IBlogPost & { _id: mongoose.Types.ObjectId },
