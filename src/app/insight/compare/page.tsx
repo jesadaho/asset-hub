@@ -73,6 +73,8 @@ function InsightCompareContent() {
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const defaultLoadedRef = useRef(false);
+  const projectsRef = useRef<CompareProject[]>([]);
+  projectsRef.current = projects;
 
   // When no slugs in URL: load default 4 projects (top by yield)
   useEffect(() => {
@@ -106,14 +108,15 @@ function InsightCompareContent() {
   }, [selectedSlugs, router, searchParams]);
 
   // Fetch compare data when selectedSlugs change (skip if we already have matching projects)
+  const slugsKey = selectedSlugs.join(",");
   useEffect(() => {
     if (selectedSlugs.length === 0) {
       setProjects([]);
       return;
     }
     const hasAll =
-      projects.length === selectedSlugs.length &&
-      selectedSlugs.every((s) => projects.some((p) => p.slug === s));
+      projectsRef.current.length === selectedSlugs.length &&
+      selectedSlugs.every((s) => projectsRef.current.some((p) => p.slug === s));
     if (hasAll) return;
 
     setLoading(true);
@@ -125,7 +128,7 @@ function InsightCompareContent() {
       })
       .catch(() => setProjects([]))
       .finally(() => setLoading(false));
-  }, [selectedSlugs, projects]);
+  }, [slugsKey]); // only re-fetch when slug list changes; avoid [projects] to prevent update loop
 
   // Search: debounce and fetch
   useEffect(() => {
@@ -195,13 +198,13 @@ function InsightCompareContent() {
       <Header />
 
       <main className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-12 lg:px-8">
-        {/* Title and tab bar on same row */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        {/* Title and tab bar: on mobile tab bar first (top), on sm+ same row */}
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <h1 className="order-2 min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:order-1 sm:text-3xl">
             ตารางเปรียบเทียบความคุ้มค่า
           </h1>
           <div
-            className="flex shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:min-w-[280px]"
+            className="order-1 flex w-full shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:order-2 sm:w-auto sm:min-w-[280px]"
             role="tablist"
             aria-label="เลือกมุมมอง Insight"
           >

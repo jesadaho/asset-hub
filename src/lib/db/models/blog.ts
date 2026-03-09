@@ -21,6 +21,8 @@ export interface IBlogPost {
   projectName?: string;
   developer?: string;
   location?: string;
+  /** เขต (district) สำหรับฟิลเตอร์ทำเล — ใช้เฉพาะเขตจากรายชื่อคงที่ */
+  district?: string;
   yearBuilt?: number | string;
   // 1. Financial Performance
   yieldPercent?: number;
@@ -58,6 +60,7 @@ const BlogPostSchema = new mongoose.Schema<IBlogPost>(
     projectName: String,
     developer: String,
     location: String,
+    district: String,
     yearBuilt: mongoose.Schema.Types.Mixed,
     yieldPercent: Number,
     capitalGainPercent: Number,

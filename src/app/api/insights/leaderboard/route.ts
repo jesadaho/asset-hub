@@ -25,6 +25,10 @@ async function resolveDisplayImageUrl(
 
 const MAX_LEADERBOARD = 50;
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function mapLeaderboardItem(
   p: IBlogPost & { _id: mongoose.Types.ObjectId },
   rank: number,
@@ -49,7 +53,7 @@ function mapLeaderboardItem(
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const location = (searchParams.get("location") ?? "").trim();
+  const district = (searchParams.get("district") ?? "").trim();
 
   try {
     await connectDB();
@@ -58,8 +62,20 @@ export async function GET(request: NextRequest) {
       status: "published",
       yieldPercent: { $exists: true, $ne: null },
     };
-    if (location.length > 0) {
-      filter.location = location;
+    if (district.length > 0) {
+      const districtCondition = {
+        $or: [
+          { district },
+          {
+            $and: [
+              { $or: [{ district: null }, { district: "" }, { district: { $exists: false } }] },
+              { location: new RegExp(escapeRegex(district), "i") },
+            ],
+          },
+        ],
+      };
+      if (!filter.$and) filter.$and = [];
+      (filter.$and as Record<string, unknown>[]).push(districtCondition);
     }
 
     const posts = await BlogPost.find(filter)

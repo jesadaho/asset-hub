@@ -125,6 +125,13 @@ export function Header() {
                 >
                   เช่า
                 </Link>
+                <Link
+                  href="/blog"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-none px-4 py-3 text-[15px] font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  บทความ
+                </Link>
                 <span className="px-4 py-2 text-xs font-medium text-slate-500">รีวิวโครงการ</span>
                 <Link
                   href="/insight"
@@ -213,6 +220,12 @@ export function Header() {
             className="text-[15px] font-medium text-slate-600 hover:text-slate-900"
           >
             เช่า
+          </Link>
+          <Link
+            href="/blog"
+            className="text-[15px] font-medium text-slate-600 hover:text-slate-900"
+          >
+            บทความ
           </Link>
           <div
             className="group relative"

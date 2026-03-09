@@ -23,6 +23,7 @@ function mapPostToJson(
     projectName: p.projectName,
     developer: p.developer,
     location: p.location,
+    district: p.district,
     yearBuilt: p.yearBuilt,
     yieldPercent: p.yieldPercent,
     capitalGainPercent: p.capitalGainPercent,
@@ -96,6 +97,7 @@ export async function PATCH(
     projectName?: string;
     developer?: string;
     location?: string;
+    district?: string;
     yearBuilt?: number | string;
     yieldPercent?: number;
     capitalGainPercent?: number;
@@ -142,6 +144,7 @@ export async function PATCH(
       if (body.projectName !== undefined) update.projectName = body.projectName?.trim();
       if (body.developer !== undefined) update.developer = (body.developer ?? "").toString().trim();
       if (body.location !== undefined) update.location = body.location?.trim();
+      if (body.district !== undefined) update.district = body.district?.trim() ?? "";
       if (body.yearBuilt !== undefined) update.yearBuilt = body.yearBuilt;
       if (typeof body.yieldPercent === "number") update.yieldPercent = body.yieldPercent;
       if (typeof body.capitalGainPercent === "number") update.capitalGainPercent = body.capitalGainPercent;

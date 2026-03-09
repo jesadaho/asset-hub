@@ -6,6 +6,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { MarkdownEditor } from "@/components/MarkdownEditor";
+import { DISTRICTS } from "@/lib/districts";
 
 const PRIMARY = "#068e7b";
 
@@ -124,6 +125,7 @@ type PostData = {
   projectName?: string;
   developer?: string;
   location?: string;
+  district?: string;
   yearBuilt?: number | string;
   yieldPercent?: number;
   capitalGainPercent?: number;
@@ -639,6 +641,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
         setDeveloper(devStr);
         developerRef.current = devStr;
         setLocation(data.location ?? "");
+        setDistrict(data.district ?? "");
         setYearBuilt(
           data.yearBuilt !== undefined && data.yearBuilt !== null
             ? String(data.yearBuilt)
@@ -703,13 +706,18 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
           setNearbyCatalyst(savedCatalyst);
           setNeighborhoodTags("");
         }
-        setDistrict("");
-        setSubDistrict("");
-        if (typeof data.location === "string" && data.location.includes(", ")) {
-          const parts = data.location.split(",").map((s) => s.trim());
-          if (parts.length >= 2) {
-            setSubDistrict(parts[0] ?? "");
-            setDistrict(parts[1] ?? "");
+        if (!(data.district ?? "").trim()) {
+          setSubDistrict("");
+          if (typeof data.location === "string" && data.location.includes(", ")) {
+            const parts = data.location.split(",").map((s) => s.trim());
+            if (parts.length >= 2) {
+              setSubDistrict(parts[0] ?? "");
+              setDistrict(parts[1] ?? "");
+            } else {
+              setDistrict("");
+            }
+          } else {
+            setDistrict("");
           }
         }
         setMetaDescription(data.metaDescription ?? "");
@@ -765,6 +773,7 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
       projectName: projectName.trim(),
       developer: dev,
       location: (subDistrict || district) ? [subDistrict, district].filter(Boolean).join(", ") : location.trim(),
+      district: district.trim() || undefined,
       yearBuilt: yearBuilt.trim() || undefined,
       yieldPercent: typeof yieldPercent === "number" ? yieldPercent : undefined,
       capitalGainPercent:
@@ -973,12 +982,28 @@ export function ProjectReviewForm({ mode, id }: ProjectReviewFormProps) {
                 />
               </div>
               <div>
-                <label className="block text-xs text-slate-500">ทำเล</label>
+                <label className="block text-xs text-slate-500">เขต</label>
+                <select
+                  value={district}
+                  onChange={(e) => setDistrict(e.target.value)}
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                >
+                  <option value="">— เลือกเขต —</option>
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-slate-500">ทำเล (ข้อความเต็ม)</label>
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                  placeholder="เช่น อ่อนนุช บางนา"
                 />
               </div>
               <div>

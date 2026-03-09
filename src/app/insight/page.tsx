@@ -76,7 +76,7 @@ function InsightContent() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [district, setDistrict] = useState("");
   const [developer, setDeveloper] = useState("");
   const [rentMin, setRentMin] = useState("");
   const [rentMax, setRentMax] = useState("");
@@ -85,7 +85,7 @@ function InsightContent() {
   const [yieldMin, setYieldMin] = useState("");
   const [yieldMax, setYieldMax] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
-  const [locations, setLocations] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
   const [developers, setDevelopers] = useState<string[]>([]);
   const searchParams = useSearchParams();
 
@@ -95,9 +95,9 @@ function InsightContent() {
 
   useEffect(() => {
     fetch("/api/insights/filters")
-      .then((res) => (res.ok ? res.json() : { locations: [], developers: [] }))
-      .then((data: { locations?: string[]; developers?: string[] }) => {
-        setLocations(data.locations ?? []);
+      .then((res) => (res.ok ? res.json() : { districts: [], developers: [] }))
+      .then((data: { districts?: string[]; developers?: string[] }) => {
+        setDistricts(data.districts ?? []);
         setDevelopers(data.developers ?? []);
       })
       .catch(() => {});
@@ -116,7 +116,7 @@ function InsightContent() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: String(PER_PAGE) });
     if (query) params.set("q", query);
-    if (location) params.set("location", location);
+    if (district) params.set("district", district);
     if (developer) params.set("developer", developer);
     const rentMinN = rentMin.trim() !== "" ? Number(rentMin) : NaN;
     const rentMaxN = rentMax.trim() !== "" ? Number(rentMax) : NaN;
@@ -142,17 +142,17 @@ function InsightContent() {
       })
       .catch((e) => setError(e instanceof Error ? e.message : "เกิดข้อผิดพลาด"))
       .finally(() => setLoading(false));
-  }, [page, query, location, developer, rentMin, rentMax, priceMin, priceMax, yieldMin, yieldMax]);
+  }, [page, query, district, developer, rentMin, rentMax, priceMin, priceMax, yieldMin, yieldMax]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page, query, location, developer, rentMin, rentMax, priceMin, priceMax, yieldMin, yieldMax]);
+  }, [page, query, district, developer, rentMin, rentMax, priceMin, priceMax, yieldMin, yieldMax]);
 
   const hasActiveFilters =
-    location || developer || rentMin || rentMax || priceMin || priceMax || yieldMin || yieldMax;
+    district || developer || rentMin || rentMax || priceMin || priceMax || yieldMin || yieldMax;
 
   function clearFilters() {
-    setLocation("");
+    setDistrict("");
     setDeveloper("");
     setRentMin("");
     setRentMax("");
@@ -169,13 +169,13 @@ function InsightContent() {
 
       <main className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-12 lg:px-8">
         <div className="mb-8">
-          {/* Title and tab bar on same row */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          {/* Title and tab bar: on mobile tab bar first (top), on sm+ same row */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <h1 className="order-2 min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:order-1 sm:text-3xl">
               รีวิวบ้านและคอนโดทั่วประเทศ
             </h1>
             <div
-              className="flex shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:min-w-[280px]"
+              className="order-1 flex w-full shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:order-2 sm:w-auto sm:min-w-[280px]"
               role="tablist"
               aria-label="เลือกมุมมอง Insight"
             >
@@ -221,23 +221,23 @@ function InsightContent() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="insight-location" className="shrink-0 text-sm text-slate-600">
-                ทำเล:
+              <label htmlFor="insight-district" className="shrink-0 text-sm text-slate-600">
+                เขต:
               </label>
               <div className="relative">
                 <select
-                  id="insight-location"
-                  value={location}
+                  id="insight-district"
+                  value={district}
                   onChange={(e) => {
-                    setLocation(e.target.value);
+                    setDistrict(e.target.value);
                     setPage(1);
                   }}
                   className="w-full min-w-[120px] appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
                 >
                   <option value="">ทั้งหมด</option>
-                  {locations.map((loc) => (
-                    <option key={loc} value={loc}>
-                      {loc}
+                  {districts.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
                     </option>
                   ))}
                 </select>

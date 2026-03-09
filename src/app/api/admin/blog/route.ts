@@ -26,6 +26,7 @@ function mapPostToJson(
     out.projectName = p.projectName;
     out.developer = p.developer;
     out.location = p.location;
+    out.district = p.district;
     out.yearBuilt = p.yearBuilt;
     out.yieldPercent = p.yieldPercent;
     out.capitalGainPercent = p.capitalGainPercent;
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status")?.trim();
-  const location = searchParams.get("location")?.trim();
+  const district = searchParams.get("district")?.trim();
   const developer = searchParams.get("developer")?.trim();
   const q = (searchParams.get("q") ?? "").trim();
   const sortBy = (searchParams.get("sortBy") ?? "updatedAt").trim();
@@ -85,7 +86,21 @@ export async function GET(request: NextRequest) {
     await connectDB();
     const filter: Record<string, unknown> = {};
     if (status === "draft" || status === "published") filter.status = status;
-    if (location?.length) filter.location = location;
+    if (district?.length) {
+      const districtCondition = {
+        $or: [
+          { district },
+          {
+            $and: [
+              { $or: [{ district: null }, { district: "" }, { district: { $exists: false } }] },
+              { location: new RegExp(escapeRegex(district), "i") },
+            ],
+          },
+        ],
+      };
+      if (!filter.$and) filter.$and = [];
+      (filter.$and as Record<string, unknown>[]).push(districtCondition);
+    }
     if (developer?.length) filter.developer = developer;
     if (q.length > 0) {
       const re = new RegExp(escapeRegex(q), "i");
@@ -93,6 +108,8 @@ export async function GET(request: NextRequest) {
         { title: re },
         { slug: re },
         { projectName: re },
+        { location: re },
+        { district: re },
       ];
     }
     const [posts, totalCount] = await Promise.all([
@@ -133,6 +150,7 @@ export async function POST(request: NextRequest) {
     projectName?: string;
     developer?: string;
     location?: string;
+    district?: string;
     yearBuilt?: number | string;
     yieldPercent?: number;
     capitalGainPercent?: number;
@@ -194,6 +212,7 @@ export async function POST(request: NextRequest) {
       createPayload.projectName = body.projectName?.trim();
       createPayload.developer = body.developer?.trim();
       createPayload.location = body.location?.trim();
+      createPayload.district = body.district?.trim() || undefined;
       createPayload.yearBuilt = body.yearBuilt;
       createPayload.yieldPercent =
         typeof body.yieldPercent === "number" ? body.yieldPercent : undefined;

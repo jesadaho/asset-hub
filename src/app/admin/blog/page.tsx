@@ -43,9 +43,9 @@ export default function AdminBlogPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState("");
-  const [location, setLocation] = useState("");
+  const [district, setDistrict] = useState("");
   const [developer, setDeveloper] = useState("");
-  const [locations, setLocations] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
   const [developers, setDevelopers] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<"updatedAt" | "viewCount" | "title">("updatedAt");
   const [order, setOrder] = useState<"asc" | "desc">("desc");
@@ -55,9 +55,9 @@ export default function AdminBlogPage() {
 
   useEffect(() => {
     fetch("/api/admin/blog/filters", { credentials: "include" })
-      .then((res) => (res.ok ? res.json() : { locations: [], developers: [] }))
-      .then((data: { locations?: string[]; developers?: string[] }) => {
-        setLocations(data.locations ?? []);
+      .then((res) => (res.ok ? res.json() : { districts: [], developers: [] }))
+      .then((data: { districts?: string[]; developers?: string[] }) => {
+        setDistricts(data.districts ?? []);
         setDevelopers(data.developers ?? []);
       })
       .catch(() => {});
@@ -76,7 +76,7 @@ export default function AdminBlogPage() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: String(PER_PAGE), sortBy, order });
     if (query) params.set("q", query);
-    if (location) params.set("location", location);
+    if (district) params.set("district", district);
     if (developer) params.set("developer", developer);
     fetch(`/api/admin/blog?${params.toString()}`, { credentials: "include" })
       .then((res) => {
@@ -90,7 +90,7 @@ export default function AdminBlogPage() {
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Error"))
       .finally(() => setLoading(false));
-  }, [page, query, location, developer, sortBy, order]);
+  }, [page, query, district, developer, sortBy, order]);
 
   function handleSort(column: "title" | "viewCount" | "updatedAt") {
     const defaultOrder: Record<typeof column, "asc" | "desc"> = {
@@ -166,23 +166,23 @@ export default function AdminBlogPage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <label htmlFor="admin-blog-location" className="text-sm text-slate-600">
-              ทำเล
+            <label htmlFor="admin-blog-district" className="text-sm text-slate-600">
+              เขต
             </label>
             <div className="relative">
               <select
-                id="admin-blog-location"
-                value={location}
+                id="admin-blog-district"
+                value={district}
                 onChange={(e) => {
-                  setLocation(e.target.value);
+                  setDistrict(e.target.value);
                   setPage(1);
                 }}
                 className="min-w-[140px] appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
               >
                 <option value="">ทั้งหมด</option>
-                {locations.map((loc) => (
-                  <option key={loc} value={loc}>
-                    {loc}
+                {districts.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
                   </option>
                 ))}
               </select>

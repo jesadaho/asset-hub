@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") ?? "10", 10) || 10));
   const skip = (page - 1) * limit;
   const q = (searchParams.get("q") ?? "").trim();
-  const location = (searchParams.get("location") ?? "").trim();
+  const district = (searchParams.get("district") ?? "").trim();
   const developer = (searchParams.get("developer") ?? "").trim();
   const rentMin = parseNum(searchParams.get("rentMin"));
   const rentMax = parseNum(searchParams.get("rentMax"));
@@ -70,7 +70,21 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const filter: Record<string, unknown> = { type: "project_review", status: "published" };
-    if (location.length > 0) filter.location = location;
+    if (district.length > 0) {
+      const districtCondition = {
+        $or: [
+          { district },
+          {
+            $and: [
+              { $or: [{ district: null }, { district: "" }, { district: { $exists: false } }] },
+              { location: new RegExp(escapeRegex(district), "i") },
+            ],
+          },
+        ],
+      };
+      if (!filter.$and) filter.$and = [];
+      (filter.$and as Record<string, unknown>[]).push(districtCondition);
+    }
     if (developer.length > 0) filter.developer = developer;
     if (q.length > 0) {
       const re = new RegExp(escapeRegex(q), "i");

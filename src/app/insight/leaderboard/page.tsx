@@ -47,30 +47,30 @@ type LeaderboardItem = {
 
 export default function LeaderboardPage() {
   const [items, setItems] = useState<LeaderboardItem[]>([]);
-  const [locations, setLocations] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [locationFilter, setLocationFilter] = useState("");
+  const [districtFilter, setDistrictFilter] = useState("");
   const [compareSlugs, setCompareSlugs] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/insights/filters")
-      .then((res) => (res.ok ? res.json() : { locations: [] }))
-      .then((data: { locations?: string[] }) => {
-        setLocations(data.locations ?? []);
+      .then((res) => (res.ok ? res.json() : { districts: [] }))
+      .then((data: { districts?: string[] }) => {
+        setDistricts(data.districts ?? []);
       })
-      .catch(() => setLocations([]));
+      .catch(() => setDistricts([]));
   }, []);
 
   useEffect(() => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (locationFilter.trim()) params.set("location", locationFilter.trim());
+    if (districtFilter.trim()) params.set("district", districtFilter.trim());
     fetch(`/api/insights/leaderboard?${params}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: LeaderboardItem[]) => setItems(data))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, [locationFilter]);
+  }, [districtFilter]);
 
   const addToCompare = useCallback((slug: string) => {
     setCompareSlugs((prev) => {
@@ -106,27 +106,27 @@ export default function LeaderboardPage() {
         <div className="mt-6 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => setLocationFilter("")}
+            onClick={() => setDistrictFilter("")}
             className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              locationFilter === ""
+              districtFilter === ""
                 ? "bg-slate-800 text-white"
                 : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             ทั้งหมด
           </button>
-          {locations.map((loc) => (
+          {districts.map((d) => (
             <button
-              key={loc}
+              key={d}
               type="button"
-              onClick={() => setLocationFilter(loc)}
+              onClick={() => setDistrictFilter(d)}
               className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-                locationFilter === loc
+                districtFilter === d
                   ? "bg-slate-800 text-white"
                   : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
-              {loc}
+              {d}
             </button>
           ))}
         </div>

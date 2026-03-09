@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -14,6 +14,7 @@ export default function AdminBlogEditPage() {
   const router = useRouter();
   const params = useParams();
   const id = params.id as string;
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [postType, setPostType] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -23,6 +24,7 @@ export default function AdminBlogEditPage() {
   const [status, setStatus] = useState<"draft" | "published">("draft");
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [viewTab, setViewTab] = useState<"form" | "preview">("form");
 
@@ -62,6 +64,33 @@ export default function AdminBlogEditPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Error"))
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file?.type.startsWith("image/")) return;
+    setUploading(true);
+    setError(null);
+    const formData = new FormData();
+    formData.set("file", file);
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && (data.key ?? data.url)) {
+        setMetaImage(data.url ?? data.key ?? "");
+      } else {
+        setError(data.message ?? "อัปโหลดรูปไม่สำเร็จ");
+      }
+    } catch {
+      setError("อัปโหลดรูปไม่สำเร็จ");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -195,17 +224,28 @@ export default function AdminBlogEditPage() {
                   {metaDescription.length > 160 && " — ยาวเกินไปสำหรับผลค้นหาบางแห่ง"}
                 </p>
               )}
-              <label htmlFor="metaImage" className="mb-1 mt-3 block text-xs text-slate-500">
-                รูปภาพ (Meta/OG) — URL รูปสำหรับแชร์และผลค้นหา
+              <label className="mb-1 mt-3 block text-xs text-slate-500">
+                รูปภาพ (Meta/OG) — แนบรูปหรือวาง URL สำหรับแชร์และผลค้นหา
               </label>
-              <input
-                id="metaImage"
-                type="url"
-                value={metaImage}
-                onChange={(e) => setMetaImage(e.target.value)}
-                placeholder="https://..."
-                className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
-              />
+              <input type="file" ref={fileInputRef} accept="image/*" className="sr-only" onChange={handleImageUpload} />
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  {uploading ? "กำลังอัปโหลด..." : "แนบรูป"}
+                </button>
+                <input
+                  id="metaImage"
+                  type="url"
+                  value={metaImage}
+                  onChange={(e) => setMetaImage(e.target.value)}
+                  placeholder="https://..."
+                  className="min-w-[200px] flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
               {metaImage && (
                 <div className="mt-2">
                   <p className="mb-1 text-xs text-slate-500">ตัวอย่าง</p>
