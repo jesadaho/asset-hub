@@ -13,7 +13,8 @@ export async function POST(
 
   try {
     await connectDB();
-    const result = await BlogPost.updateOne(
+    // ใช้ collection.updateOne เพื่อไม่ให้ Mongoose ปัด updatedAt (timestamps)
+    const result = await BlogPost.collection.updateOne(
       {
         slug: slug.trim(),
         type: "project_review",
