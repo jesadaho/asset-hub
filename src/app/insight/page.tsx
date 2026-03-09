@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
@@ -67,7 +67,7 @@ function InsightCardRow({ item }: { item: InsightItem }) {
 
 const PER_PAGE = 10;
 
-export default function InsightPage() {
+function InsightContent() {
   const [posts, setPosts] = useState<InsightItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -489,5 +489,24 @@ export default function InsightPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function InsightPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50">
+          <Header />
+          <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center py-20">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
+            </div>
+          </main>
+        </div>
+      }
+    >
+      <InsightContent />
+    </Suspense>
   );
 }
