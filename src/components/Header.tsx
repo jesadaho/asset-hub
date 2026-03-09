@@ -181,7 +181,7 @@ export function Header() {
                   onClick={() => setMobileNavOpen(false)}
                   className="flex items-center gap-2 rounded-none px-4 py-2.5 pl-6 text-[15px] font-semibold text-slate-800 hover:bg-slate-50"
                 >
-                  ตารางเปรียบเทียบความคุ้มค่า
+                  ตารางเทียบความคุ้มค่า
                   <span className="rounded bg-[#068e7b] px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-white">New</span>
                 </Link>
                 <Link
@@ -305,7 +305,7 @@ export function Header() {
                   className="flex items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50"
                   role="menuitem"
                 >
-                  ตารางเปรียบเทียบความคุ้มค่า
+                  ตารางเทียบความคุ้มค่า
                   <span className="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-white" style={{ backgroundColor: PRIMARY }}>New</span>
                 </Link>
                 <Link
