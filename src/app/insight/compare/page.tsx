@@ -328,9 +328,70 @@ function InsightCompareContent() {
         {selectedSlugs.length > 0 && (
           <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
             {loading ? (
-              <div className="flex items-center justify-center p-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
-              </div>
+              <table className="w-full min-w-[720px] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/80">
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      โครงการ
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      นักพัฒนา
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      ทำเล
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Yield (%)
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      ราคาต่อ ตรม (บาท)
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      ราคา (บาท)
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      ค่าเช่า (บาท)
+                    </th>
+                    <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                      Capital Gain (%)
+                    </th>
+                    <th className="w-12 px-2 py-3" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {[1, 2, 3, 4].map((i) => (
+                    <tr key={i} className="border-b border-slate-100">
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-32 animate-pulse rounded bg-slate-200" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-24 animate-pulse rounded bg-slate-100" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-20 animate-pulse rounded bg-slate-100" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-10 animate-pulse rounded bg-slate-200" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-16 animate-pulse rounded bg-slate-100" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-28 animate-pulse rounded bg-slate-100" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-14 animate-pulse rounded bg-slate-100" />
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="h-4 w-10 animate-pulse rounded bg-slate-100" />
+                      </td>
+                      <td className="px-2 py-3">
+                        <div className="h-6 w-6 animate-pulse rounded bg-slate-100" />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             ) : (
               <table className="w-full min-w-[720px] border-collapse text-left">
                 <thead>
@@ -465,9 +526,20 @@ export default function InsightComparePage() {
       fallback={
         <div className="min-h-screen bg-slate-50">
           <Header />
-          <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center py-20">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
+          <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+              <div className="h-8 w-72 animate-pulse rounded bg-slate-200" />
+              <div className="h-10 w-[280px] animate-pulse rounded-lg bg-slate-100" />
+            </div>
+            <div className="h-4 w-96 animate-pulse rounded bg-slate-100" />
+            <div className="mt-8 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="p-12">
+                <div className="mx-auto flex flex-wrap gap-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                  ))}
+                </div>
+              </div>
             </div>
           </main>
         </div>

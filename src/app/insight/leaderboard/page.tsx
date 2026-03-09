@@ -98,7 +98,9 @@ export default function LeaderboardPage() {
         <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           ทำเนียบคอนโดคุ้ม
         </h1>
-        <p className="mt-2 text-slate-600">Best Value Hall of Fame</p>
+        <p className="mt-2 text-slate-600">
+          สรุปสถิติผลตอบแทนการเช่าและอัตราการเข้าพักจริง อัปเดตล่าสุดปี 2026
+        </p>
 
         {/* Quick filter */}
         <div className="mt-6 flex flex-wrap gap-2">
@@ -131,11 +133,25 @@ export default function LeaderboardPage() {
 
         {/* List */}
         <div className="mt-8 space-y-3">
-          {loading && (
-            <div className="flex justify-center py-12">
-              <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
-            </div>
-          )}
+          {loading &&
+            [1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-nowrap"
+              >
+                <div className="h-10 w-10 shrink-0 animate-pulse rounded-lg bg-slate-200" />
+                <div className="h-[60px] w-[60px] shrink-0 animate-pulse rounded-lg bg-slate-200" />
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+                  <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+                </div>
+                <div className="flex shrink-0 gap-3">
+                  <div className="h-4 w-16 animate-pulse rounded bg-slate-100" />
+                  <div className="h-4 w-20 animate-pulse rounded bg-slate-100" />
+                  <div className="h-7 w-12 animate-pulse rounded-full bg-slate-200" />
+                </div>
+              </div>
+            ))}
           {!loading && items.length === 0 && (
             <div className="rounded-xl border border-slate-200 bg-white p-10 text-center text-slate-600">
               ไม่พบโครงการในทำเนียบ
