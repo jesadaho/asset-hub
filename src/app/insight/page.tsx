@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { Header } from "@/components/Header";
 
@@ -86,6 +87,11 @@ export default function InsightPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const [locations, setLocations] = useState<string[]>([]);
   const [developers, setDevelopers] = useState<string[]>([]);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("openFilter") === "1") setFilterOpen(true);
+  }, [searchParams]);
 
   useEffect(() => {
     fetch("/api/insights/filters")
@@ -161,17 +167,42 @@ export default function InsightPage() {
     <div className="min-h-screen bg-slate-50">
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-12 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            รีวิวบ้านและคอนโดทั่วประเทศ
-          </h1>
-          <p className="mt-2 text-slate-600">
+          {/* Title and tab bar on same row */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h1 className="min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              รีวิวบ้านและคอนโดทั่วประเทศ
+            </h1>
+            <div
+              className="flex shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:min-w-[280px]"
+              role="tablist"
+              aria-label="เลือกมุมมอง Insight"
+            >
+              <span
+                role="tab"
+                aria-selected="true"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm"
+              >
+                <span aria-hidden>📑</span>
+                บทความ
+              </span>
+              <Link
+                href="/insight/compare"
+                role="tab"
+                aria-selected="false"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-800"
+              >
+                <span aria-hidden>📊</span>
+                Matrix
+              </Link>
+            </div>
+          </div>
+          <p className="mt-3 text-slate-600 sm:mt-4">
             รีวิวบ้านและคอนโดทั่วประเทศ เจาะลึกด้วยข้อมูลสถิติการลงทุน Rental Yield จริงจากหน้างาน และวิเคราะห์สภาพคล่องรายโครงการ เพื่อเป็นเครื่องมือสำคัญในการตัดสินใจลงทุนของคุณ
           </p>
-          <div>
-            <div className="mt-4 flex flex-wrap items-center gap-4">
-            <div className="relative max-w-md flex-1">
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="relative min-w-0 flex-1" style={{ maxWidth: "320px" }}>
               <label htmlFor="insight-search" className="sr-only">
                 ค้นหารีวิว
               </label>
@@ -184,14 +215,14 @@ export default function InsightPage() {
                 type="search"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="ค้นหาชื่อโครงการ, ผู้พัฒนา, ทำเล..."
+                placeholder="ค้นหาชื่อโครงการ..."
                 className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 sm:text-sm"
                 aria-label="ค้นหารีวิว"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="insight-location" className="text-sm text-slate-600">
-                ทำเล
+              <label htmlFor="insight-location" className="shrink-0 text-sm text-slate-600">
+                ทำเล:
               </label>
               <div className="relative">
                 <select
@@ -201,7 +232,7 @@ export default function InsightPage() {
                     setLocation(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full min-w-[140px] appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                  className="w-full min-w-[120px] appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
                 >
                   <option value="">ทั้งหมด</option>
                   {locations.map((loc) => (
@@ -216,16 +247,16 @@ export default function InsightPage() {
             <button
               type="button"
               onClick={() => setFilterOpen((o) => !o)}
-              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-1 focus:ring-slate-500 ${
+              className={`inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-1 focus:ring-slate-500 ${
                 filterOpen
                   ? "border-slate-500 bg-slate-100 text-slate-800"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
               <SlidersHorizontal className="h-4 w-4 shrink-0" />
-              ตัวกรองเพิ่มเติม
+              กรองเพิ่มเติม
             </button>
-            </div>
+          </div>
             {filterOpen && (
               <div className="mt-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -350,7 +381,6 @@ export default function InsightPage() {
                 )}
               </div>
             )}
-          </div>
         </div>
 
         {error && (

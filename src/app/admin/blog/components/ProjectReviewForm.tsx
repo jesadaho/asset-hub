@@ -17,7 +17,7 @@ const yieldClasses = {
 } as const;
 
 function getYieldLevel(y: number): keyof typeof yieldClasses {
-  if (y > 7) return "high";
+  if (y >= 7) return "high";
   if (y >= 6) return "good";
   if (y >= 4.5) return "avg";
   return "low";

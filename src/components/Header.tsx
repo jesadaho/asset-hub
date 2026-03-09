@@ -43,11 +43,19 @@ export function Header() {
   const [sessionLoading, setSessionLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [insightMenuOpen, setInsightMenuOpen] = useState(false);
+  const insightMenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
 
   useOnClickOutside(menuRef, () => setMenuOpen(false));
   useOnClickOutside(mobileNavRef, () => setMobileNavOpen(false));
+
+  useEffect(() => {
+    return () => {
+      if (insightMenuCloseTimerRef.current) clearTimeout(insightMenuCloseTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     fetch("/api/auth/session", { credentials: "include" })
@@ -117,12 +125,35 @@ export function Header() {
                 >
                   เช่า
                 </Link>
+                <span className="px-4 py-2 text-xs font-medium text-slate-500">รีวิวโครงการ</span>
                 <Link
                   href="/insight"
                   onClick={() => setMobileNavOpen(false)}
-                  className="rounded-none px-4 py-3 text-[15px] font-medium text-slate-700 hover:bg-slate-50"
+                  className="rounded-none px-4 py-2.5 pl-6 text-[15px] text-slate-700 hover:bg-slate-50"
                 >
-                  รีวิวโครงการ
+                  บทความรีวิวทั้งหมด
+                </Link>
+                <Link
+                  href="/insight/compare"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="flex items-center gap-2 rounded-none px-4 py-2.5 pl-6 text-[15px] font-semibold text-slate-800 hover:bg-slate-50"
+                >
+                  ตารางเปรียบเทียบความคุ้มค่า
+                  <span className="rounded bg-[#068e7b] px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-white">New</span>
+                </Link>
+                <Link
+                  href="/insight/leaderboard"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-none px-4 py-2.5 pl-6 text-[15px] text-slate-700 hover:bg-slate-50"
+                >
+                  ทำเนียบคอนโดคุ้ม (Best Value Hall of Fame)
+                </Link>
+                <Link
+                  href="/insight?openFilter=1"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="rounded-none px-4 py-2.5 pl-6 text-[15px] text-slate-700 hover:bg-slate-50"
+                >
+                  ค้นหาตามงบประมาณ (Advanced Search)
                 </Link>
                 <div className="border-t border-slate-100 px-4 py-3">
                   <div className="mb-2">
@@ -183,12 +214,69 @@ export function Header() {
           >
             เช่า
           </Link>
-          <Link
-            href="/insight"
-            className="text-[15px] font-medium text-slate-600 hover:text-slate-900"
+          <div
+            className="group relative"
+            onMouseEnter={() => {
+              if (insightMenuCloseTimerRef.current) {
+                clearTimeout(insightMenuCloseTimerRef.current);
+                insightMenuCloseTimerRef.current = null;
+              }
+              setInsightMenuOpen(true);
+            }}
+            onMouseLeave={() => {
+              insightMenuCloseTimerRef.current = setTimeout(() => setInsightMenuOpen(false), 120);
+            }}
           >
-            รีวิวโครงการ
-          </Link>
+            <button
+              type="button"
+              className="flex items-center gap-1 text-[15px] font-medium text-slate-600 hover:text-slate-900"
+              aria-expanded={insightMenuOpen}
+              aria-haspopup="true"
+            >
+              รีวิวโครงการ
+              <svg className="h-4 w-4 transition group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {insightMenuOpen && (
+              <div
+                className="absolute left-0 top-full z-[100] pt-1"
+                role="menu"
+              >
+                <div className="min-w-[260px] rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+                <Link
+                  href="/insight"
+                  className="block px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+                  role="menuitem"
+                >
+                  บทความรีวิวทั้งหมด
+                </Link>
+                <Link
+                  href="/insight/compare"
+                  className="flex items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                  role="menuitem"
+                >
+                  ตารางเปรียบเทียบความคุ้มค่า
+                  <span className="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase leading-none text-white" style={{ backgroundColor: PRIMARY }}>New</span>
+                </Link>
+                <Link
+                  href="/insight/leaderboard"
+                  className="block px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+                  role="menuitem"
+                >
+                  ทำเนียบคอนโดคุ้ม (Best Value Hall of Fame)
+                </Link>
+                <Link
+                  href="/insight?openFilter=1"
+                  className="block px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
+                  role="menuitem"
+                >
+                  ค้นหาตามงบประมาณ (Advanced Search)
+                </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </nav>
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="hidden sm:block">
