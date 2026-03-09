@@ -201,7 +201,7 @@ function InsightCompareContent() {
         {/* Title and tab bar: on mobile tab bar first (top), on sm+ same row */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <h1 className="order-2 min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:order-1 sm:text-3xl">
-            ตารางเทียบความคุ้มค่า
+            ตารางเปรียบเทียบความคุ้มค่า
           </h1>
           <div
             className="order-1 flex w-full shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:order-2 sm:w-auto sm:min-w-[320px]"
@@ -223,7 +223,7 @@ function InsightCompareContent() {
               className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm"
             >
               <span aria-hidden>📊</span>
-              ตารางเทียบ
+              ตารางเปรียบเทียบ
             </span>
           </div>
         </div>
