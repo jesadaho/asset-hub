@@ -38,12 +38,13 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
 
-    // When no slugs but default=N: return top N by yieldPercent (desc)
+    // When no slugs but default=N: return top N by yieldPercent (desc), ค่าเช่าขั้นต่ำ 10000
     if (slugs.length === 0 && defaultLimit > 0) {
       const posts = await BlogPost.find({
         type: "project_review",
         status: "published",
         yieldPercent: { $exists: true, $ne: null },
+        avgRentPrice: { $gte: 10000 },
       })
         .sort({ yieldPercent: -1 })
         .limit(defaultLimit)
