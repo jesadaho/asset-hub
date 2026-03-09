@@ -6,6 +6,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import { Header } from "@/components/Header";
+import { ArticleShareButton } from "@/components/ArticleShareButton";
 
 const PRIMARY = "#068e7b";
 
@@ -258,9 +259,9 @@ export default function InsightDetailPage() {
                 {[data.developer, data.location, data.yearBuilt].filter(Boolean).join(" · ")}
               </p>
             )}
-            <p className="mt-4 text-sm font-medium" style={{ color: PRIMARY }}>
-              แชร์บทความ
-            </p>
+            <div className="mt-4">
+              <ArticleShareButton title={data.title || data.projectName} />
+            </div>
           </div>
           {data.metaImage && (
             <div className="relative h-32 w-full shrink-0 overflow-hidden sm:h-full sm:min-h-[188px] sm:w-[48%] md:min-h-[204px] sm:rounded-r-2xl">

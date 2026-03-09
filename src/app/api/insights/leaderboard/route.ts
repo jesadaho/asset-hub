@@ -51,9 +51,16 @@ function mapLeaderboardItem(
   };
 }
 
+function parseRentMin(value: string | null): number {
+  if (value == null || value.trim() === "") return 8000;
+  const n = Number(value.trim());
+  return Number.isFinite(n) && n >= 0 ? n : 8000;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const district = (searchParams.get("district") ?? "").trim();
+  const rentMin = parseRentMin(searchParams.get("rentMin"));
 
   try {
     await connectDB();
@@ -62,6 +69,9 @@ export async function GET(request: NextRequest) {
       status: "published",
       yieldPercent: { $exists: true, $ne: null },
     };
+    if (rentMin > 0) {
+      filter.avgRentPrice = { $gte: rentMin };
+    }
     if (district.length > 0) {
       const districtCondition = {
         $or: [

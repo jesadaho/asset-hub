@@ -13,6 +13,7 @@
     "@aws-sdk/s3-request-presigner": "^3.993.0",
     "@google/generative-ai": "^0.24.1",
     "@line/liff": "^2.27.3",
+    "@tailwindcss/typography": "^0.5.19",
     "@uiw/react-md-editor": "^4.0.11",
     "lucide-react": "^0.574.0",
     "mongoose": "^9.2.1",
@@ -21,7 +22,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
-    "remark-breaks": "^4.0.0"
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

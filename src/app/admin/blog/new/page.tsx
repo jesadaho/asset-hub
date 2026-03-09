@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { MarkdownEditor } from "@/components/MarkdownEditor";
 
 export default function AdminBlogNewPage() {
   const router = useRouter();
@@ -161,14 +162,13 @@ export default function AdminBlogNewPage() {
           </div>
           <div>
             <label htmlFor="content" className="block text-sm font-medium text-slate-700">
-              เนื้อหา
+              เนื้อหา (Markdown)
             </label>
-            <textarea
-              id="content"
-              rows={12}
+            <MarkdownEditor
               value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900"
+              onChange={setContent}
+              placeholder="เขียนเนื้อหาแบบ Markdown..."
+              minHeight={320}
             />
           </div>
           <div>

@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
+import remarkGfm from "remark-gfm";
 import { Header } from "@/components/Header";
+import { ArticleShareButton } from "@/components/ArticleShareButton";
 
 type BlogPost = {
   id: string;
@@ -73,9 +75,12 @@ export default function BlogSlugPage() {
           ← บทความ
         </Link>
         <article className="mt-4">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-            {post.title}
-          </h1>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+              {post.title}
+            </h1>
+            <ArticleShareButton title={post.title} />
+          </div>
           {post.metaImage && (
             <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
               <img
@@ -85,8 +90,8 @@ export default function BlogSlugPage() {
               />
             </div>
           )}
-          <div className="prose prose-slate mt-6 max-w-none prose-p:text-slate-700 prose-headings:text-slate-900 [&_img]:rounded-lg">
-            <ReactMarkdown remarkPlugins={[remarkBreaks]}>
+          <div className="prose prose-slate mt-6 max-w-none prose-p:text-slate-700 prose-headings:text-slate-900 prose-a:text-[#068e7b] prose-a:no-underline hover:prose-a:underline prose-ul:my-4 prose-li:my-0.5 [&_img]:rounded-lg">
+            <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
               {post.content || ""}
             </ReactMarkdown>
           </div>

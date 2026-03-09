@@ -167,7 +167,7 @@ function InsightContent() {
     <div className="min-h-screen bg-slate-50">
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-12 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 pt-4 pb-6 sm:px-6 sm:pt-6 lg:px-8">
         <div className="mb-8">
           {/* Title and tab bar: on mobile tab bar first (top), on sm+ same row */}
           <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -498,7 +498,7 @@ export default function InsightPage() {
       fallback={
         <div className="min-h-screen bg-slate-50">
           <Header />
-          <main className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-12 lg:px-8">
+          <main className="mx-auto max-w-7xl px-4 pt-4 pb-6 sm:px-6 sm:pt-6 lg:px-8">
             <div className="mb-8">
               <div className="h-8 w-64 animate-pulse rounded bg-slate-200" />
               <div className="mt-3 h-4 w-96 animate-pulse rounded bg-slate-100" />

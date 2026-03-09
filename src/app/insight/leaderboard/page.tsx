@@ -2,11 +2,20 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ChevronDown } from "lucide-react";
 import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
 const MAX_COMPARE = 8;
+
+const RENT_MIN_OPTIONS: { value: number; label: string }[] = [
+  { value: 0, label: "ไม่จำกัด" },
+  { value: 5000, label: "5,000 บาทขึ้นไป" },
+  { value: 8000, label: "8,000 บาทขึ้นไป" },
+  { value: 10000, label: "10,000 บาทขึ้นไป" },
+  { value: 15000, label: "15,000 บาทขึ้นไป" },
+  { value: 20000, label: "20,000 บาทขึ้นไป" },
+];
 
 const yieldPillClasses = {
   high: "bg-green-100 text-green-800 font-semibold",
@@ -50,6 +59,7 @@ export default function LeaderboardPage() {
   const [districts, setDistricts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [districtFilter, setDistrictFilter] = useState("");
+  const [rentMin, setRentMin] = useState(8000);
   const [compareSlugs, setCompareSlugs] = useState<string[]>([]);
 
   useEffect(() => {
@@ -65,12 +75,13 @@ export default function LeaderboardPage() {
     setLoading(true);
     const params = new URLSearchParams();
     if (districtFilter.trim()) params.set("district", districtFilter.trim());
+    if (rentMin > 0) params.set("rentMin", String(rentMin));
     fetch(`/api/insights/leaderboard?${params}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: LeaderboardItem[]) => setItems(data))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  }, [districtFilter]);
+  }, [districtFilter, rentMin]);
 
   const addToCompare = useCallback((slug: string) => {
     setCompareSlugs((prev) => {
@@ -102,20 +113,21 @@ export default function LeaderboardPage() {
           สรุปสถิติผลตอบแทนการเช่าและอัตราการเข้าพักจริง อัปเดตล่าสุดปี 2026
         </p>
 
-        {/* Quick filter */}
-        <div className="mt-6 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setDistrictFilter("")}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-              districtFilter === ""
-                ? "bg-slate-800 text-white"
-                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
-            }`}
-          >
-            ทั้งหมด
-          </button>
-          {districts.map((d) => (
+        {/* Quick filter: เขต + ค่าเช่าขั้นต่ำ */}
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setDistrictFilter("")}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                districtFilter === ""
+                  ? "bg-slate-800 text-white"
+                  : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              ทั้งหมด
+            </button>
+            {districts.map((d) => (
             <button
               key={d}
               type="button"
@@ -129,6 +141,27 @@ export default function LeaderboardPage() {
               {d}
             </button>
           ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <label htmlFor="leaderboard-rent-min" className="shrink-0 text-sm font-medium text-slate-600">
+              ค่าเช่าขั้นต่ำ:
+            </label>
+            <div className="relative">
+              <select
+                id="leaderboard-rent-min"
+                value={rentMin}
+                onChange={(e) => setRentMin(Number(e.target.value))}
+                className="min-w-[160px] appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+              >
+                {RENT_MIN_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden />
+            </div>
+          </div>
         </div>
 
         {/* List */}

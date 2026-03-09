@@ -197,7 +197,7 @@ function InsightCompareContent() {
     <div className="min-h-screen bg-slate-50">
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 pt-10 pb-6 sm:px-6 sm:pt-12 lg:px-8">
+      <main className="mx-auto max-w-7xl px-4 pt-4 pb-6 sm:px-6 sm:pt-6 lg:px-8">
         {/* Title and tab bar: on mobile tab bar first (top), on sm+ same row */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <h1 className="order-2 min-w-0 flex-1 text-2xl font-bold tracking-tight text-slate-900 sm:order-1 sm:text-3xl">
