@@ -77,16 +77,6 @@ type InsightDetail = {
 
 type InsightListItem = { id: string; slug: string; projectName?: string; title?: string };
 
-function formatUpdatedAt(updatedAt?: string): string {
-  if (!updatedAt) return "";
-  try {
-    const d = new Date(updatedAt);
-    return d.toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" });
-  } catch {
-    return "";
-  }
-}
-
 export default function InsightDetailPage() {
   const params = useParams();
   const slug = params.slug as string;
@@ -207,7 +197,6 @@ export default function InsightDetailPage() {
   }
 
   const marketRentEntries = parseMarketRentDisplay(data.marketRentDisplay ?? "");
-  const updatedStr = formatUpdatedAt(data.updatedAt);
 
   return (
     <div className="min-h-screen">
@@ -286,12 +275,6 @@ export default function InsightDetailPage() {
         <main className="mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
-            {updatedStr && (
-              <p className="text-sm text-slate-500">
-                อัปเดตเมื่อ: {updatedStr}
-              </p>
-            )}
-
           {/* ข้อมูลโครงการ: นักพัฒนา, ทำเล, ปีที่สร้าง */}
           {(data.developer || data.location || data.yearBuilt) && (
             <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4">

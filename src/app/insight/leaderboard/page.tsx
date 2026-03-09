@@ -259,10 +259,16 @@ export default function LeaderboardPage() {
                     )}
                     {typeof item.yieldPercent === "number" && (
                       <span
+                        className={`group/yield relative inline-flex shrink-0 cursor-help items-center rounded-full px-2.5 py-0.5 text-xs sm:px-3 sm:py-1 sm:text-sm ${yieldPillClasses[getYieldLevel(item.yieldPercent)]}`}
                         title="อัตราผลตอบแทนจากการเช่า (Rental Yield) — ยิ่งสูงยิ่งคุ้มค่า"
-                        className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs sm:px-3 sm:py-1 sm:text-sm ${yieldPillClasses[getYieldLevel(item.yieldPercent)]}`}
                       >
                         {item.yieldPercent}%
+                        <span
+                          role="tooltip"
+                          className="pointer-events-none absolute bottom-full left-1/2 z-[100] mb-1.5 -translate-x-1/2 whitespace-nowrap rounded-lg bg-slate-800 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover/yield:opacity-100"
+                        >
+                          อัตราผลตอบแทนจากการเช่า (Rental Yield) — ยิ่งสูงยิ่งคุ้มค่า
+                        </span>
                       </span>
                     )}
                     <button
