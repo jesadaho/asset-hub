@@ -229,7 +229,7 @@ export default function InsightDetailPage() {
         className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         style={{ marginTop: "-20rem", marginBottom: "-2.5rem" }}
       >
-        <div className="flex min-h-[160px] w-full flex-col overflow-hidden rounded-2xl bg-slate-100 shadow-xl sm:max-h-[380px] sm:min-h-[188px] sm:flex-row sm:items-stretch md:min-h-[204px]">
+        <div className="flex min-h-[192px] w-full flex-col overflow-hidden rounded-2xl bg-slate-100 shadow-xl sm:max-h-[380px] sm:min-h-[188px] sm:flex-row sm:items-stretch md:min-h-[204px]">
           <div className="flex min-w-0 flex-1 flex-col justify-center px-5 py-6 sm:px-8 sm:py-8 md:px-10 md:py-10">
             <nav className="text-sm text-slate-500">
               <Link href="/insight" className="hover:text-slate-700">
@@ -253,7 +253,7 @@ export default function InsightDetailPage() {
             </div>
           </div>
           {data.metaImage && (
-            <div className="relative h-32 w-full shrink-0 overflow-hidden sm:h-full sm:min-h-[188px] sm:w-[48%] md:min-h-[204px] sm:rounded-r-2xl">
+            <div className="relative h-40 w-full shrink-0 overflow-hidden sm:h-full sm:min-h-[188px] sm:w-[48%] md:min-h-[204px] sm:rounded-r-2xl">
               <img
                 src={data.metaImage}
                 alt=""
@@ -476,7 +476,7 @@ export default function InsightDetailPage() {
           )}
 
           {data.content && (
-            <div className="prose prose-sm max-w-none prose-p:text-slate-700 [&_br]:block [&>*]:mb-4 [&>*:last-child]:mb-0 [&_h1]:!mt-0 [&_h1]:!mb-2 [&_h1]:!text-2xl [&_h1]:!font-bold [&_h1]:!text-slate-900 [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-slate-800 [&_h3]:mt-4 [&_h3]:mb-1.5 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-800">
+            <div className="prose max-w-none prose-p:text-slate-700 [&_br]:block [&>*]:mb-4 [&>*:last-child]:mb-0 [&_h1]:!mt-0 [&_h1]:!mb-2 [&_h1]:!text-2xl [&_h1]:!font-bold [&_h1]:!text-slate-900 [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:text-slate-800 [&_h3]:mt-4 [&_h3]:mb-1.5 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-800">
               <ReactMarkdown remarkPlugins={[remarkBreaks]}>
                 {data.content}
               </ReactMarkdown>
