@@ -52,6 +52,15 @@ export function Header() {
   useOnClickOutside(mobileNavRef, () => setMobileNavOpen(false));
 
   useEffect(() => {
+    if (mobileNavOpen) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }
+  }, [mobileNavOpen]);
+
+  useEffect(() => {
     return () => {
       if (insightMenuCloseTimerRef.current) clearTimeout(insightMenuCloseTimerRef.current);
     };
@@ -104,13 +113,40 @@ export function Header() {
             <Image src="/logo.png" alt="" width={28} height={28} className="h-7 w-7 object-contain" />
             AssetHub
           </Link>
+
+          {/* Mobile: backdrop */}
           {mobileNavOpen && (
-            <div
-              className="absolute left-0 top-full z-[100] mt-1 w-[280px] border border-slate-200 bg-white shadow-lg sm:hidden"
-              role="navigation"
-              aria-label="เมนูหลัก"
-            >
-              <nav className="flex flex-col py-2">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(false)}
+              className="fixed inset-0 z-40 bg-black/50 sm:hidden"
+              aria-label="ปิดเมนู"
+            />
+          )}
+          {/* Mobile: slide-in drawer from left */}
+          <div
+            className={`fixed left-0 top-0 z-50 h-full w-[280px] max-w-[85vw] transform border-r border-slate-200 bg-white shadow-xl transition-transform duration-300 ease-out sm:hidden ${
+              mobileNavOpen ? "translate-x-0" : "-translate-x-full"
+            }`}
+            role="navigation"
+            aria-label="เมนูหลัก"
+            aria-hidden={!mobileNavOpen}
+          >
+            <nav className="flex h-full flex-col overflow-y-auto py-4">
+              <div className="flex items-center justify-between border-b border-slate-100 px-4 pb-3">
+                <span className="text-sm font-semibold text-slate-500">เมนู</span>
+                <button
+                  type="button"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100"
+                  aria-label="ปิดเมนู"
+                >
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex flex-col py-2">
                 <Link
                   href="/listings?listingType=sale"
                   onClick={() => setMobileNavOpen(false)}
@@ -162,51 +198,51 @@ export function Header() {
                 >
                   ค้นหาตามงบประมาณ (Advanced Search)
                 </Link>
-                <div className="border-t border-slate-100 px-4 py-3">
-                  <div className="mb-2">
-                    <LanguageSwitcher />
-                  </div>
-                  {!sessionLoading &&
-                    (user ? (
-                      <div className="mt-2 flex flex-col gap-0.5">
-                        {user.isAdmin && (
-                          <Link
-                            href="/admin"
-                            onClick={() => setMobileNavOpen(false)}
-                            className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-                          >
-                            Admin
-                          </Link>
-                        )}
+              </div>
+              <div className="mt-auto border-t border-slate-100 px-4 py-4">
+                <div className="mb-2">
+                  <LanguageSwitcher />
+                </div>
+                {!sessionLoading &&
+                  (user ? (
+                    <div className="mt-2 flex flex-col gap-0.5">
+                      {user.isAdmin && (
                         <Link
-                          href="/profile"
+                          href="/admin"
                           onClick={() => setMobileNavOpen(false)}
                           className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                         >
-                          โปรไฟล์
+                          Admin
                         </Link>
-                        <button
-                          type="button"
-                          onClick={handleSignOut}
-                          className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
-                        >
-                          ออกจากระบบ
-                        </button>
-                      </div>
-                    ) : (
+                      )}
                       <Link
-                        href="/sign-in"
+                        href="/profile"
                         onClick={() => setMobileNavOpen(false)}
-                        className="mt-2 inline-flex items-center rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition hover:opacity-90"
-                        style={{ borderColor: PRIMARY, color: PRIMARY }}
+                        className="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
                       >
-                        Sign in
+                        โปรไฟล์
                       </Link>
-                    ))}
-                </div>
-              </nav>
-            </div>
-          )}
+                      <button
+                        type="button"
+                        onClick={handleSignOut}
+                        className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+                      >
+                        ออกจากระบบ
+                      </button>
+                    </div>
+                  ) : (
+                    <Link
+                      href="/sign-in"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="mt-2 inline-flex items-center rounded-lg border-2 px-3 py-2.5 text-sm font-medium transition hover:opacity-90"
+                      style={{ borderColor: PRIMARY, color: PRIMARY }}
+                    >
+                      Sign in
+                    </Link>
+                  ))}
+              </div>
+            </nav>
+          </div>
         </div>
         <nav className="hidden items-center gap-6 sm:flex" aria-label="หลัก">
           <Link
@@ -295,15 +331,13 @@ export function Header() {
           <div className="hidden sm:block">
             <LanguageSwitcher />
           </div>
-          <a
-            href="https://assethub.in.th"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/sign-in"
             className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
             style={{ backgroundColor: PRIMARY }}
           >
             ลงประกาศ
-          </a>
+          </Link>
           {!sessionLoading &&
             (user ? (
               <div className="relative hidden sm:block" ref={menuRef}>
