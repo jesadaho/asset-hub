@@ -106,21 +106,21 @@ export function Header() {
                 <Link
                   href="/listings?listingType=sale"
                   onClick={() => setMobileNavOpen(false)}
-                  className="rounded-none px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className="rounded-none px-4 py-3 text-[15px] font-medium text-slate-700 hover:bg-slate-50"
                 >
                   ขาย
                 </Link>
                 <Link
                   href="/listings?listingType=rent"
                   onClick={() => setMobileNavOpen(false)}
-                  className="rounded-none px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className="rounded-none px-4 py-3 text-[15px] font-medium text-slate-700 hover:bg-slate-50"
                 >
                   เช่า
                 </Link>
                 <Link
                   href="/insight"
                   onClick={() => setMobileNavOpen(false)}
-                  className="rounded-none px-4 py-3 text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className="rounded-none px-4 py-3 text-[15px] font-medium text-slate-700 hover:bg-slate-50"
                 >
                   รีวิวโครงการ
                 </Link>
@@ -173,19 +173,19 @@ export function Header() {
         <nav className="hidden items-center gap-6 sm:flex" aria-label="หลัก">
           <Link
             href="/listings?listingType=sale"
-            className="text-base font-medium text-slate-600 hover:text-slate-900"
+            className="text-[15px] font-medium text-slate-600 hover:text-slate-900"
           >
             ขาย
           </Link>
           <Link
             href="/listings?listingType=rent"
-            className="text-base font-medium text-slate-600 hover:text-slate-900"
+            className="text-[15px] font-medium text-slate-600 hover:text-slate-900"
           >
             เช่า
           </Link>
           <Link
             href="/insight"
-            className="text-base font-medium text-slate-600 hover:text-slate-900"
+            className="text-[15px] font-medium text-slate-600 hover:text-slate-900"
           >
             รีวิวโครงการ
           </Link>

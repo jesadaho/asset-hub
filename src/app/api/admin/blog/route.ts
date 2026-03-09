@@ -47,6 +47,10 @@ function mapPostToJson(
   return out;
 }
 
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function slugFromTitle(title: string): string {
   return title
     .trim()
@@ -63,16 +67,36 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const status = searchParams.get("status")?.trim();
+  const location = searchParams.get("location")?.trim();
+  const developer = searchParams.get("developer")?.trim();
+  const q = (searchParams.get("q") ?? "").trim();
+  const sortBy = (searchParams.get("sortBy") ?? "updatedAt").trim();
+  const order = (searchParams.get("order") ?? "desc").trim();
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") ?? "20", 10) || 20));
   const skip = (page - 1) * limit;
 
+  const sortField =
+    sortBy === "viewCount" ? "viewCount" : sortBy === "title" ? "title" : "updatedAt";
+  const sortDir = (order === "asc" ? 1 : -1) as 1 | -1;
+  const sortOption = { [sortField]: sortDir } as Record<string, 1 | -1>;
+
   try {
     await connectDB();
-    const filter: Record<string, string> = {};
+    const filter: Record<string, unknown> = {};
     if (status === "draft" || status === "published") filter.status = status;
+    if (location?.length) filter.location = location;
+    if (developer?.length) filter.developer = developer;
+    if (q.length > 0) {
+      const re = new RegExp(escapeRegex(q), "i");
+      filter.$or = [
+        { title: re },
+        { slug: re },
+        { projectName: re },
+      ];
+    }
     const [posts, totalCount] = await Promise.all([
-      BlogPost.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit).lean(),
+      BlogPost.find(filter).sort(sortOption).skip(skip).limit(limit).lean(),
       BlogPost.countDocuments(filter),
     ]);
     const totalPages = Math.ceil(totalCount / limit);

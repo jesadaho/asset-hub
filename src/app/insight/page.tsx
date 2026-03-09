@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
@@ -75,6 +75,27 @@ export default function InsightPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("");
+  const [developer, setDeveloper] = useState("");
+  const [rentMin, setRentMin] = useState("");
+  const [rentMax, setRentMax] = useState("");
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [yieldMin, setYieldMin] = useState("");
+  const [yieldMax, setYieldMax] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [locations, setLocations] = useState<string[]>([]);
+  const [developers, setDevelopers] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetch("/api/insights/filters")
+      .then((res) => (res.ok ? res.json() : { locations: [], developers: [] }))
+      .then((data: { locations?: string[]; developers?: string[] }) => {
+        setLocations(data.locations ?? []);
+        setDevelopers(data.developers ?? []);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -89,6 +110,20 @@ export default function InsightPage() {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: String(PER_PAGE) });
     if (query) params.set("q", query);
+    if (location) params.set("location", location);
+    if (developer) params.set("developer", developer);
+    const rentMinN = rentMin.trim() !== "" ? Number(rentMin) : NaN;
+    const rentMaxN = rentMax.trim() !== "" ? Number(rentMax) : NaN;
+    const priceMinN = priceMin.trim() !== "" ? Number(priceMin) : NaN;
+    const priceMaxN = priceMax.trim() !== "" ? Number(priceMax) : NaN;
+    const yieldMinN = yieldMin.trim() !== "" ? Number(yieldMin) : NaN;
+    const yieldMaxN = yieldMax.trim() !== "" ? Number(yieldMax) : NaN;
+    if (!Number.isNaN(rentMinN)) params.set("rentMin", String(rentMinN));
+    if (!Number.isNaN(rentMaxN)) params.set("rentMax", String(rentMaxN));
+    if (!Number.isNaN(priceMinN)) params.set("priceMin", String(priceMinN));
+    if (!Number.isNaN(priceMaxN)) params.set("priceMax", String(priceMaxN));
+    if (!Number.isNaN(yieldMinN)) params.set("yieldMin", String(yieldMinN));
+    if (!Number.isNaN(yieldMaxN)) params.set("yieldMax", String(yieldMaxN));
     fetch(`/api/insights?${params.toString()}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load");
@@ -101,11 +136,26 @@ export default function InsightPage() {
       })
       .catch((e) => setError(e instanceof Error ? e.message : "เกิดข้อผิดพลาด"))
       .finally(() => setLoading(false));
-  }, [page, query]);
+  }, [page, query, location, developer, rentMin, rentMax, priceMin, priceMax, yieldMin, yieldMax]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page, query]);
+  }, [page, query, location, developer, rentMin, rentMax, priceMin, priceMax, yieldMin, yieldMax]);
+
+  const hasActiveFilters =
+    location || developer || rentMin || rentMax || priceMin || priceMax || yieldMin || yieldMax;
+
+  function clearFilters() {
+    setLocation("");
+    setDeveloper("");
+    setRentMin("");
+    setRentMax("");
+    setPriceMin("");
+    setPriceMax("");
+    setYieldMin("");
+    setYieldMax("");
+    setPage(1);
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -119,23 +169,187 @@ export default function InsightPage() {
           <p className="mt-2 text-slate-600">
             รีวิวบ้านและคอนโดทั่วประเทศ เจาะลึกด้วยข้อมูลสถิติการลงทุน Rental Yield จริงจากหน้างาน และวิเคราะห์สภาพคล่องรายโครงการ เพื่อเป็นเครื่องมือสำคัญในการตัดสินใจลงทุนของคุณ
           </p>
-          <div className="relative mt-4 max-w-md">
-            <label htmlFor="insight-search" className="sr-only">
-              ค้นหารีวิว
-            </label>
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
-              aria-hidden
-            />
-            <input
-              id="insight-search"
-              type="search"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="ค้นหาชื่อโครงการ, ผู้พัฒนา, ทำเล..."
-              className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 sm:text-sm"
-              aria-label="ค้นหารีวิว"
-            />
+          <div>
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+            <div className="relative max-w-md flex-1">
+              <label htmlFor="insight-search" className="sr-only">
+                ค้นหารีวิว
+              </label>
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+                aria-hidden
+              />
+              <input
+                id="insight-search"
+                type="search"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="ค้นหาชื่อโครงการ, ผู้พัฒนา, ทำเล..."
+                className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 sm:text-sm"
+                aria-label="ค้นหารีวิว"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="insight-location" className="text-sm text-slate-600">
+                ทำเล
+              </label>
+              <div className="relative">
+                <select
+                  id="insight-location"
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full min-w-[140px] appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                >
+                  <option value="">ทั้งหมด</option>
+                  {locations.map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden />
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFilterOpen((o) => !o)}
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-1 focus:ring-slate-500 ${
+                filterOpen
+                  ? "border-slate-500 bg-slate-100 text-slate-800"
+                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+              }`}
+            >
+              <SlidersHorizontal className="h-4 w-4 shrink-0" />
+              ตัวกรองเพิ่มเติม
+            </button>
+            </div>
+            {filterOpen && (
+              <div className="mt-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div>
+                    <label htmlFor="insight-developer" className="block text-xs font-medium text-slate-500">
+                      นักพัฒนา
+                    </label>
+                    <div className="relative mt-1">
+                      <select
+                        id="insight-developer"
+                        value={developer}
+                        onChange={(e) => {
+                          setDeveloper(e.target.value);
+                          setPage(1);
+                        }}
+                        className="w-full appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      >
+                        <option value="">ทั้งหมด</option>
+                        {developers.map((dev) => (
+                          <option key={dev} value={dev}>
+                            {dev}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-medium text-slate-500">ค่าเช่า (บาท)</span>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        value={rentMin}
+                        onChange={(e) => {
+                          setRentMin(e.target.value);
+                          setPage(1);
+                        }}
+                        placeholder="ขั้นต่ำ"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      />
+                      <input
+                        type="number"
+                        min={0}
+                        value={rentMax}
+                        onChange={(e) => {
+                          setRentMax(e.target.value);
+                          setPage(1);
+                        }}
+                        placeholder="สูงสุด"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-medium text-slate-500">ราคา (บาท)</span>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        value={priceMin}
+                        onChange={(e) => {
+                          setPriceMin(e.target.value);
+                          setPage(1);
+                        }}
+                        placeholder="ขั้นต่ำ"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      />
+                      <input
+                        type="number"
+                        min={0}
+                        value={priceMax}
+                        onChange={(e) => {
+                          setPriceMax(e.target.value);
+                          setPage(1);
+                        }}
+                        placeholder="สูงสุด"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="block text-xs font-medium text-slate-500">Yield (%)</span>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.5}
+                        value={yieldMin}
+                        onChange={(e) => {
+                          setYieldMin(e.target.value);
+                          setPage(1);
+                        }}
+                        placeholder="ขั้นต่ำ"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      />
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.5}
+                        value={yieldMax}
+                        onChange={(e) => {
+                          setYieldMax(e.target.value);
+                          setPage(1);
+                        }}
+                        placeholder="สูงสุด"
+                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="mt-4 text-sm font-medium text-slate-600 hover:text-slate-900"
+                  >
+                    ล้างตัวกรอง
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -176,11 +390,11 @@ export default function InsightPage() {
         {!loading && posts.length === 0 && !error && (
           <div className="rounded-xl border border-slate-200 bg-white p-12 text-center">
             <p className="font-medium text-slate-700">
-              {query ? "ไม่พบรายการที่ตรงกับคำค้น" : "ยังไม่มีรีวิว"}
+              {query || hasActiveFilters ? "ไม่พบรายการที่ตรงกับคำค้นหรือตัวกรอง" : "ยังไม่มีรีวิว"}
             </p>
             <p className="mt-1 text-sm text-slate-500">
-              {query
-                ? "ลองเปลี่ยนคำค้นหรือลบคำค้นเพื่อดูทั้งหมด"
+              {query || hasActiveFilters
+                ? "ลองปรับหรือล้างตัวกรองเพื่อดูทั้งหมด"
                 : "รีวิวโครงการจะแสดงที่นี่เมื่อมีโพสต์ที่เผยแพร่แล้ว"}
             </p>
           </div>

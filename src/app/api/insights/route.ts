@@ -46,16 +46,32 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function parseNum(s: string | null): number | null {
+  if (s == null || s.trim() === "") return null;
+  const n = Number(s.trim());
+  return Number.isFinite(n) ? n : null;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
   const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") ?? "10", 10) || 10));
   const skip = (page - 1) * limit;
   const q = (searchParams.get("q") ?? "").trim();
+  const location = (searchParams.get("location") ?? "").trim();
+  const developer = (searchParams.get("developer") ?? "").trim();
+  const rentMin = parseNum(searchParams.get("rentMin"));
+  const rentMax = parseNum(searchParams.get("rentMax"));
+  const priceMin = parseNum(searchParams.get("priceMin"));
+  const priceMax = parseNum(searchParams.get("priceMax"));
+  const yieldMin = parseNum(searchParams.get("yieldMin"));
+  const yieldMax = parseNum(searchParams.get("yieldMax"));
 
   try {
     await connectDB();
     const filter: Record<string, unknown> = { type: "project_review", status: "published" };
+    if (location.length > 0) filter.location = location;
+    if (developer.length > 0) filter.developer = developer;
     if (q.length > 0) {
       const re = new RegExp(escapeRegex(q), "i");
       filter.$or = [
@@ -65,6 +81,25 @@ export async function GET(request: NextRequest) {
         { location: re },
         { metaDescription: re },
       ];
+    }
+    if (rentMin != null || rentMax != null) {
+      filter.avgRentPrice = {} as Record<string, number>;
+      if (rentMin != null) (filter.avgRentPrice as Record<string, number>).$gte = rentMin;
+      if (rentMax != null) (filter.avgRentPrice as Record<string, number>).$lte = rentMax;
+    }
+    if (priceMin != null || priceMax != null) {
+      const priceConditions: Record<string, unknown>[] = [];
+      if (priceMin != null) priceConditions.push({ priceMax: { $gte: priceMin } });
+      if (priceMax != null) priceConditions.push({ priceMin: { $lte: priceMax } });
+      if (priceConditions.length > 0) {
+        if (!filter.$and) filter.$and = [];
+        (filter.$and as Record<string, unknown>[]).push(...priceConditions);
+      }
+    }
+    if (yieldMin != null || yieldMax != null) {
+      filter.yieldPercent = {} as Record<string, number>;
+      if (yieldMin != null) (filter.yieldPercent as Record<string, number>).$gte = yieldMin;
+      if (yieldMax != null) (filter.yieldPercent as Record<string, number>).$lte = yieldMax;
     }
     const [posts, totalCount] = await Promise.all([
       BlogPost.find(filter).sort({ updatedAt: -1 }).skip(skip).limit(limit).lean(),
