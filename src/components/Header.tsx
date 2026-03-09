@@ -153,7 +153,7 @@ export function Header() {
                   onClick={() => setMobileNavOpen(false)}
                   className="rounded-none px-4 py-2.5 pl-6 text-[15px] text-slate-700 hover:bg-slate-50"
                 >
-                  ทำเนียบคอนโดคุ้ม
+                  ทำเนียบคอนโดผลตอบแทนสูง
                 </Link>
                 <Link
                   href="/insight?openFilter=1"
@@ -277,7 +277,7 @@ export function Header() {
                   className="block px-4 py-2.5 text-left text-sm text-slate-700 hover:bg-slate-50"
                   role="menuitem"
                 >
-                  ทำเนียบคอนโดคุ้ม
+                  ทำเนียบคอนโดผลตอบแทนสูง
                 </Link>
                 <Link
                   href="/insight?openFilter=1"

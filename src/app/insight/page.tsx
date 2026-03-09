@@ -222,7 +222,7 @@ function InsightContent() {
             </div>
             <div className="flex items-center gap-2">
               <label htmlFor="insight-district" className="shrink-0 text-sm text-slate-600">
-                เขต:
+                <span className="hidden sm:inline">เขต:</span>
               </label>
               <div className="relative">
                 <select
@@ -232,6 +232,7 @@ function InsightContent() {
                     setDistrict(e.target.value);
                     setPage(1);
                   }}
+                  aria-label="เขต"
                   className="w-full min-w-[120px] appearance-none rounded-lg border border-slate-300 bg-white py-2.5 pl-3 pr-9 text-sm text-slate-700 focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
                 >
                   <option value="">ทั้งหมด</option>
@@ -247,14 +248,15 @@ function InsightContent() {
             <button
               type="button"
               onClick={() => setFilterOpen((o) => !o)}
+              aria-label="กรองเพิ่มเติม"
               className={`inline-flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-1 focus:ring-slate-500 ${
                 filterOpen
                   ? "border-slate-500 bg-slate-100 text-slate-800"
                   : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
               }`}
             >
-              <SlidersHorizontal className="h-4 w-4 shrink-0" />
-              กรองเพิ่มเติม
+              <SlidersHorizontal className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="hidden sm:inline">กรองเพิ่มเติม</span>
             </button>
           </div>
             {filterOpen && (
