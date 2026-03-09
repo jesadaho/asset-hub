@@ -546,15 +546,15 @@ export default function InsightDetailPage() {
                 ))}
               </ul>
               <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/80 p-3">
-                <p className="text-xs font-medium text-slate-600">
+                <p className="text-sm font-medium text-slate-600">
                   เราอยากได้เรื่องจากคุณ
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-sm text-slate-500">
                   มีประสบการณ์ลงทุนหรือรีวิวโครงการที่อยากแชร์?
                 </p>
                 <a
                   href="mailto:insight@assethub.in.th"
-                  className="mt-2 inline-block rounded-lg px-3 py-1.5 text-xs font-medium text-white"
+                  className="mt-2 inline-block rounded-lg px-3 py-2 text-sm font-medium text-white"
                   style={{ backgroundColor: PRIMARY }}
                 >
                   แชร์เรื่องของคุณ
