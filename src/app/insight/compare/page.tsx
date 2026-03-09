@@ -204,7 +204,7 @@ function InsightCompareContent() {
             ตารางเปรียบเทียบความคุ้มค่า
           </h1>
           <div
-            className="order-1 flex w-full shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:order-2 sm:w-auto sm:min-w-[280px]"
+            className="order-1 flex w-full shrink-0 rounded-lg border border-slate-200 bg-slate-100/60 p-1 sm:order-2 sm:w-auto sm:min-w-[320px]"
             role="tablist"
             aria-label="เลือกมุมมอง Insight"
           >
@@ -212,7 +212,7 @@ function InsightCompareContent() {
               href="/insight"
               role="tab"
               aria-selected="false"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-800"
+              className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-white/80 hover:text-slate-800"
             >
               <span aria-hidden>📑</span>
               บทความ
@@ -220,10 +220,10 @@ function InsightCompareContent() {
             <span
               role="tab"
               aria-selected="true"
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm"
+              className="flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md bg-white px-3 py-2 text-sm font-medium text-slate-800 shadow-sm"
             >
               <span aria-hidden>📊</span>
-              Matrix
+              ตารางเปรียบเทียบ
             </span>
           </div>
         </div>

@@ -280,7 +280,7 @@ export default function LeaderboardPage() {
                           ? "เลือกแล้ว"
                           : !canAdd
                             ? `เลือกได้สูงสุด ${MAX_COMPARE} โครงการ`
-                            : "เพิ่มเข้าเทียบใน Matrix"
+                            : "เพิ่มเข้าเทียบในตารางเปรียบเทียบ"
                       }
                       className={`inline-flex shrink-0 items-center justify-center rounded-lg border p-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 sm:gap-1 sm:px-3 sm:py-1.5 ${
                         inCompare
@@ -297,7 +297,7 @@ export default function LeaderboardPage() {
                           ? "เลือกแล้ว"
                           : !canAdd
                             ? `เลือกได้สูงสุด ${MAX_COMPARE} โครงการ`
-                            : "เพิ่มเข้าเทียบใน Matrix"
+                            : "เพิ่มเข้าเทียบในตารางเปรียบเทียบ"
                       }
                     >
                       <Plus className="h-4 w-4" />
@@ -353,7 +353,7 @@ export default function LeaderboardPage() {
               className="shrink-0 rounded-lg px-4 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
               style={{ backgroundColor: PRIMARY }}
             >
-              วิเคราะห์ Matrix
+              วิเคราะห์ตารางเปรียบเทียบ
             </Link>
           </div>
         </div>
