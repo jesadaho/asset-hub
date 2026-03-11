@@ -4,7 +4,6 @@ import { connectDB } from "@/lib/db/mongodb";
 import { BlogPost } from "@/lib/db/models/blog";
 import type { IBlogPost } from "@/lib/db/models/blog";
 import { requireAdmin } from "@/lib/auth/require-admin";
-import { delByPrefix } from "@/lib/cache/redis";
 
 function mapPostToJson(
   p: IBlogPost & { _id: mongoose.Types.ObjectId }
@@ -183,7 +182,6 @@ export async function PATCH(
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
     const saved = updated as IBlogPost & { _id: mongoose.Types.ObjectId };
-    if (isProjectReview) await delByPrefix("insights:");
     return NextResponse.json(mapPostToJson(saved));
   } catch (err) {
     console.error("[PATCH /api/admin/blog/[id]]", err);
@@ -212,7 +210,6 @@ export async function DELETE(
     if (!result) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
-    if ((result as IBlogPost).type === "project_review") await delByPrefix("insights:");
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[DELETE /api/admin/blog/[id]]", err);
