@@ -4,6 +4,9 @@ import { connectDB } from "@/lib/db/mongodb";
 import { BlogPost } from "@/lib/db/models/blog";
 import type { IBlogPost } from "@/lib/db/models/blog";
 import { getPresignedGetUrl } from "@/lib/s3";
+import { get, set } from "@/lib/cache/redis";
+
+const INSIGHTS_SLUG_TTL = 180;
 
 function parseProsCons(content: string): { main: string; pros: string[]; cons: string[] } {
   const full = content ?? "";
@@ -92,14 +95,25 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
-  if (!slug?.trim()) {
+  const slugTrim = slug?.trim();
+  if (!slugTrim) {
     return NextResponse.json({ message: "Slug required" }, { status: 400 });
+  }
+
+  const cacheKey = `insights:slug:${slugTrim}`;
+  const cached = await get(cacheKey);
+  if (cached) {
+    try {
+      return NextResponse.json(JSON.parse(cached) as Record<string, unknown>);
+    } catch {
+      // invalid cache, fall through
+    }
   }
 
   try {
     await connectDB();
     const post = await BlogPost.findOne({
-      slug: slug.trim(),
+      slug: slugTrim,
       type: "project_review",
       status: "published",
     }).lean();
@@ -110,7 +124,9 @@ export async function GET(
 
     const doc = post as IBlogPost & { _id: mongoose.Types.ObjectId };
     const metaImageUrl = await resolveDisplayImageUrl(doc.metaImage, doc.imageKeys);
-    return NextResponse.json(mapDetailToJson(doc, metaImageUrl));
+    const body = mapDetailToJson(doc, metaImageUrl);
+    await set(cacheKey, JSON.stringify(body), INSIGHTS_SLUG_TTL);
+    return NextResponse.json(body);
   } catch (err) {
     console.error("[GET /api/insights/[slug]]", err);
     return NextResponse.json(

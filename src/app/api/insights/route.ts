@@ -4,6 +4,9 @@ import { connectDB } from "@/lib/db/mongodb";
 import { BlogPost } from "@/lib/db/models/blog";
 import type { IBlogPost } from "@/lib/db/models/blog";
 import { getPresignedGetUrl } from "@/lib/s3";
+import { get, set } from "@/lib/cache/redis";
+
+const INSIGHTS_LIST_TTL = 90;
 
 async function resolveDisplayImageUrl(
   metaImage?: string | null,
@@ -52,6 +55,36 @@ function parseNum(s: string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function buildInsightsListCacheKey(params: {
+  page: number;
+  limit: number;
+  q: string;
+  district: string;
+  developer: string;
+  rentMin: number | null;
+  rentMax: number | null;
+  priceMin: number | null;
+  priceMax: number | null;
+  yieldMin: number | null;
+  yieldMax: number | null;
+}): string {
+  const parts = [
+    "insights:list",
+    params.page,
+    params.limit,
+    params.q,
+    params.district,
+    params.developer,
+    params.rentMin ?? "",
+    params.rentMax ?? "",
+    params.priceMin ?? "",
+    params.priceMax ?? "",
+    params.yieldMin ?? "",
+    params.yieldMax ?? "",
+  ];
+  return parts.join(":");
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10) || 1);
@@ -66,6 +99,28 @@ export async function GET(request: NextRequest) {
   const priceMax = parseNum(searchParams.get("priceMax"));
   const yieldMin = parseNum(searchParams.get("yieldMin"));
   const yieldMax = parseNum(searchParams.get("yieldMax"));
+
+  const cacheKey = buildInsightsListCacheKey({
+    page,
+    limit,
+    q,
+    district,
+    developer,
+    rentMin,
+    rentMax,
+    priceMin,
+    priceMax,
+    yieldMin,
+    yieldMax,
+  });
+  const cached = await get(cacheKey);
+  if (cached) {
+    try {
+      return NextResponse.json(JSON.parse(cached) as Record<string, unknown>);
+    } catch {
+      // invalid cache, fall through
+    }
+  }
 
   try {
     await connectDB();
@@ -128,7 +183,7 @@ export async function GET(request: NextRequest) {
         )
       )
     );
-    return NextResponse.json({
+    const body = {
       posts: posts.map((p, i) => {
         const doc = p as typeof p & { _id: mongoose.Types.ObjectId };
         return mapInsightListItem(doc, metaImageUrls[i] ?? null);
@@ -136,7 +191,9 @@ export async function GET(request: NextRequest) {
       totalCount,
       totalPages,
       page,
-    });
+    };
+    await set(cacheKey, JSON.stringify(body), INSIGHTS_LIST_TTL);
+    return NextResponse.json(body);
   } catch (err) {
     console.error("[GET /api/insights]", err);
     return NextResponse.json(

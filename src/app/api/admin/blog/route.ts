@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db/mongodb";
 import { BlogPost } from "@/lib/db/models/blog";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import type { IBlogPost } from "@/lib/db/models/blog";
+import { delByPrefix } from "@/lib/cache/redis";
 
 function mapPostToJson(
   p: IBlogPost & { _id: mongoose.Types.ObjectId }
@@ -265,6 +266,7 @@ export async function POST(request: NextRequest) {
     const saved = doc.toObject() as IBlogPost & {
       _id: mongoose.Types.ObjectId;
     };
+    if (type === "project_review") await delByPrefix("insights:");
     return NextResponse.json(mapPostToJson(saved));
   } catch (err) {
     console.error("[POST /api/admin/blog]", err);
