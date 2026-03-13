@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db/mongodb";
-import { Property } from "@/lib/db/models/property";
+import { connectAssetAceDB } from "@/lib/db/mongodb";
+import { getPropertyModel } from "@/lib/db/models/property";
 import { requireAdmin } from "@/lib/auth/require-admin";
 
 export async function GET() {
@@ -8,7 +8,8 @@ export async function GET() {
   if (auth instanceof NextResponse) return auth;
 
   try {
-    await connectDB();
+    const assetAceConnection = await connectAssetAceDB();
+    const Property = getPropertyModel(assetAceConnection);
     const [totalListings, saleCount, rentCount] = await Promise.all([
       Property.countDocuments({ publicListing: true, status: "Available" }),
       Property.countDocuments({

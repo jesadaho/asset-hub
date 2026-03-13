@@ -1,8 +1,9 @@
-import { connectDB } from "@/lib/db/mongodb";
-import { Property } from "@/lib/db/models/property";
+import { connectAssetAceDB } from "@/lib/db/mongodb";
+import { getPropertyModel } from "@/lib/db/models/property";
 
 export default async function AdminPage() {
-  await connectDB();
+  const assetAceConnection = await connectAssetAceDB();
+  const Property = getPropertyModel(assetAceConnection);
   const [totalListings, saleCount, rentCount] = await Promise.all([
     Property.countDocuments({ publicListing: true, status: "Available" }),
     Property.countDocuments({

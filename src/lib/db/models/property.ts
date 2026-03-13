@@ -15,6 +15,7 @@ export interface IProperty {
   address: string;
   imageKeys: string[];
   listingType?: string;
+  saleWithTenant?: boolean;
   bedrooms?: string;
   bathrooms?: string;
   addressPrivate?: boolean;
@@ -42,7 +43,7 @@ export interface IProperty {
   updatedAt?: Date;
 }
 
-const PropertySchema = new mongoose.Schema<IProperty>(
+export const PropertySchema = new mongoose.Schema<IProperty>(
   {
     ownerId: { type: String, required: true },
     name: { type: String, required: true },
@@ -52,6 +53,7 @@ const PropertySchema = new mongoose.Schema<IProperty>(
     address: { type: String, required: true },
     imageKeys: { type: [String], default: [] },
     listingType: String,
+    saleWithTenant: Boolean,
     bedrooms: String,
     bathrooms: String,
     addressPrivate: Boolean,
@@ -81,5 +83,18 @@ const PropertySchema = new mongoose.Schema<IProperty>(
 
 PropertySchema.index({ ownerId: 1 });
 
-export const Property =
-  mongoose.models.Property ?? mongoose.model<IProperty>("Property", PropertySchema);
+export function getPropertyModel(connection?: mongoose.Connection) {
+  if (connection) {
+    return (
+      (connection.models.Property as mongoose.Model<IProperty> | undefined) ??
+      connection.model<IProperty>("Property", PropertySchema)
+    );
+  }
+
+  return (
+    (mongoose.models.Property as mongoose.Model<IProperty> | undefined) ??
+    mongoose.model<IProperty>("Property", PropertySchema)
+  );
+}
+
+export const Property = getPropertyModel();

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { connectDB } from "@/lib/db/mongodb";
-import { Property } from "@/lib/db/models/property";
+import { connectAssetAceDB } from "@/lib/db/mongodb";
+import { getPropertyModel } from "@/lib/db/models/property";
 import { getPresignedGetUrl } from "@/lib/s3";
 
 export async function GET(
@@ -14,11 +14,16 @@ export async function GET(
   }
 
   try {
-    await connectDB();
+    const assetAceConnection = await connectAssetAceDB();
+    const Property = getPropertyModel(assetAceConnection);
     const doc = await Property.findOne({ _id: id }).lean();
     const publicListing = (doc as { publicListing?: boolean }).publicListing;
     const status = (doc as { status?: string }).status;
-    if (!doc || !publicListing || status !== "Available") {
+    const listingType = (doc as { listingType?: string }).listingType;
+    const saleWithTenant = (doc as { saleWithTenant?: boolean }).saleWithTenant;
+    const isPublicSaleWithTenant =
+      listingType === "sale" && saleWithTenant === true;
+    if (!doc || !publicListing || (status !== "Available" && !isPublicSaleWithTenant)) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
 
@@ -41,7 +46,8 @@ export async function GET(
       bathrooms: (doc as { bathrooms?: string }).bathrooms,
       squareMeters: (doc as { squareMeters?: string }).squareMeters,
       amenities: (doc as { amenities?: string[] }).amenities ?? [],
-      listingType: (doc as { listingType?: string }).listingType,
+      listingType,
+      saleWithTenant: saleWithTenant ?? false,
       imageUrls,
       agentName: (doc as { agentName?: string }).agentName,
       agentLineAccountId: (doc as { agentLineAccountId?: string }).agentLineAccountId,

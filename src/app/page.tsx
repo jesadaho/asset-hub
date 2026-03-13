@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { Header } from "@/components/Header";
+import { RecommendedAssetsSection } from "@/components/RecommendedAssetsSection";
 import { SearchFilterBar } from "@/components/SearchFilterBar";
 import { NewToMarketSection } from "@/components/NewToMarketSection";
 
@@ -49,6 +50,7 @@ function HomePageContent() {
         </div>
       </div>
 
+      <RecommendedAssetsSection />
       <NewToMarketSection />
     </>
   );

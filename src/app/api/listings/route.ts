@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { connectDB } from "@/lib/db/mongodb";
-import { Property } from "@/lib/db/models/property";
+import { connectAssetAceDB } from "@/lib/db/mongodb";
+import { getPropertyModel } from "@/lib/db/models/property";
 import { getPresignedGetUrl } from "@/lib/s3";
 
 const DEFAULT_LIMIT = 12;
@@ -32,7 +32,8 @@ export async function GET(request: NextRequest) {
       : undefined;
 
   try {
-    await connectDB();
+    const assetAceConnection = await connectAssetAceDB();
+    const Property = getPropertyModel(assetAceConnection);
 
     const filter: Record<string, unknown> = {
       publicListing: true,

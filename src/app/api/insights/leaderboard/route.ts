@@ -23,8 +23,6 @@ async function resolveDisplayImageUrl(
   return null;
 }
 
-const MAX_LEADERBOARD = 50;
-
 function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -90,7 +88,6 @@ export async function GET(request: NextRequest) {
 
     const posts = await BlogPost.find(filter)
       .sort({ yieldPercent: -1 })
-      .limit(MAX_LEADERBOARD)
       .lean()
       .exec();
 
