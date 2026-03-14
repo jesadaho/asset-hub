@@ -21,7 +21,7 @@ export async function GET() {
       listingType: "sale",
       $or: [
         { publicListing: true, status: "Available" },
-        { saleWithTenant: true },
+        { saleWithTenant: true, status: { $nin: ["Paused", "Archived"] } },
       ],
     })
       .sort({ createdAt: -1, _id: -1 })

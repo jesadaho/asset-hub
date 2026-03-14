@@ -27,7 +27,10 @@ export async function GET(
     const saleWithTenant = (doc as { saleWithTenant?: boolean }).saleWithTenant;
     const publicListing = (doc as { publicListing?: boolean }).publicListing;
     const isVisibleSaleWithTenant =
-      listingType === "sale" && saleWithTenant === true;
+      listingType === "sale" &&
+      saleWithTenant === true &&
+      status !== "Paused" &&
+      status !== "Archived";
     const isVisiblePublicListing = publicListing && status === "Available";
     if (!doc || (!isVisiblePublicListing && !isVisibleSaleWithTenant)) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
