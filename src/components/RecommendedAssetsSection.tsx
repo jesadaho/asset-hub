@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Bug, ChevronDown, ChevronUp, Home } from "lucide-react";
+import { Home } from "lucide-react";
 
 const PRIMARY = "#068e7b";
 
@@ -18,14 +18,6 @@ type RecommendedAsset = {
   saleWithTenant?: boolean;
   status: string;
   imageUrl: string | null;
-};
-
-type RecommendedAssetsDebug = {
-  requestedUrl: string;
-  statusCode?: number;
-  responseBodySnippet?: string;
-  errorMessage?: string;
-  itemCount?: number;
 };
 
 function CardSkeleton() {
@@ -106,8 +98,6 @@ export function RecommendedAssetsSection() {
   const [items, setItems] = useState<RecommendedAsset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [debug, setDebug] = useState<RecommendedAssetsDebug | null>(null);
-  const [debugOpen, setDebugOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,41 +105,16 @@ export function RecommendedAssetsSection() {
     async function fetchItems() {
       setLoading(true);
       setError(null);
-      setDebug(null);
       try {
-        const url = "/api/recommended-assets";
-        const res = await fetch(url);
-        const text = await res.text();
-        let data: { message?: string; listings?: RecommendedAsset[] } = {};
-        try {
-          data = JSON.parse(text);
-        } catch {
-          setDebug({
-            requestedUrl: url,
-            statusCode: res.status,
-            responseBodySnippet: text.slice(0, 500),
-            errorMessage: "Response is not JSON",
-          });
-          throw new Error(`API error ${res.status}: ${res.statusText}`);
-        }
+        const res = await fetch("/api/recommended-assets");
+        const data: { message?: string; listings?: RecommendedAsset[] } =
+          await res.json().catch(() => ({}));
         if (!res.ok) {
-          setDebug({
-            requestedUrl: url,
-            statusCode: res.status,
-            responseBodySnippet: text.slice(0, 500),
-            errorMessage: data.message || "Failed to load recommended assets",
-          });
           throw new Error(data.message || "Failed to load recommended assets");
         }
         if (!cancelled) {
           const nextItems = Array.isArray(data.listings) ? data.listings : [];
           setItems(nextItems);
-          setDebug({
-            requestedUrl: url,
-            statusCode: res.status,
-            responseBodySnippet: text.slice(0, 500),
-            itemCount: nextItems.length,
-          });
         }
       } catch (err) {
         if (!cancelled) {
@@ -193,63 +158,6 @@ export function RecommendedAssetsSection() {
         {error && (
           <div className="mt-6 rounded-lg bg-red-50 p-4 text-sm text-red-700">
             {error}
-          </div>
-        )}
-
-        {(debug || error) && (
-          <div className="mt-4 rounded-lg border border-slate-300 bg-slate-100 font-mono text-xs">
-            <button
-              type="button"
-              onClick={() => setDebugOpen((open) => !open)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-left text-slate-700 hover:bg-slate-200"
-            >
-              <Bug className="h-4 w-4" aria-hidden />
-              <span className="font-semibold">Debug view</span>
-              {debugOpen ? (
-                <ChevronUp className="ml-auto h-4 w-4" />
-              ) : (
-                <ChevronDown className="ml-auto h-4 w-4" />
-              )}
-            </button>
-            {debugOpen && debug && (
-              <div className="space-y-2 border-t border-slate-300 p-3 text-slate-600">
-                <div>
-                  <span className="font-semibold text-slate-700">Request URL:</span>
-                  <pre className="mt-0.5 break-all whitespace-pre-wrap rounded bg-white/80 p-2">
-                    {debug.requestedUrl}
-                  </pre>
-                </div>
-                <div>
-                  <span className="font-semibold text-slate-700">Status:</span>{" "}
-                  {debug.statusCode || "(network error)"}
-                </div>
-                {debug.itemCount != null && (
-                  <div>
-                    <span className="font-semibold text-slate-700">Item count:</span>{" "}
-                    {debug.itemCount}
-                  </div>
-                )}
-                {debug.errorMessage && (
-                  <div>
-                    <span className="font-semibold text-slate-700">Error:</span>
-                    <pre className="mt-0.5 break-all whitespace-pre-wrap rounded bg-white/80 p-2 text-red-700">
-                      {debug.errorMessage}
-                    </pre>
-                  </div>
-                )}
-                <div>
-                  <span className="font-semibold text-slate-700">Response snippet:</span>
-                  <pre className="mt-0.5 max-h-40 overflow-auto break-all whitespace-pre-wrap rounded bg-white/80 p-2">
-                    {debug.responseBodySnippet || "(empty)"}
-                  </pre>
-                </div>
-              </div>
-            )}
-            {debugOpen && !debug && error && (
-              <div className="border-t border-slate-300 p-3 text-slate-600">
-                No debug info (request may have failed before response).
-              </div>
-            )}
           </div>
         )}
 
