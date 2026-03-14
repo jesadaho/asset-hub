@@ -11,6 +11,8 @@ type RecommendedAsset = {
   name: string;
   type: string;
   price: number;
+  salePrice?: number;
+  monthlyRent?: number;
   address: string;
   listingType?: string;
   saleWithTenant?: boolean;
@@ -29,12 +31,12 @@ type RecommendedAssetsDebug = {
 function CardSkeleton() {
   return (
     <div className="flex min-w-[280px] max-w-[320px] flex-shrink-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white sm:min-w-0">
-      <div className="h-40 shrink-0 animate-pulse bg-slate-200" />
+      <div className="h-40 max-h-[180px] shrink-0 animate-pulse bg-slate-200" />
       <div className="space-y-2 p-4">
-        <div className="h-4 w-20 animate-pulse rounded bg-slate-200" />
-        <div className="h-6 w-28 animate-pulse rounded bg-slate-200" />
+        <div className="h-5 w-24 animate-pulse rounded bg-slate-200" />
+        <div className="h-4 w-32 animate-pulse rounded bg-slate-200" />
         <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
-        <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200" />
+        <div className="h-3 w-3/4 animate-pulse rounded bg-slate-200" />
       </div>
     </div>
   );
@@ -69,10 +71,22 @@ function RecommendedAssetCard({ item }: { item: RecommendedAsset }) {
           )}
         </div>
       </div>
-      <div className="flex flex-col p-4">
+      <div className="flex min-h-[152px] flex-1 flex-col p-4">
+        <p className="text-xs font-medium text-slate-500">
+          {item.listingType === "sale" && item.salePrice
+            ? "ราคาขาย"
+            : item.saleWithTenant && item.monthlyRent
+              ? "ค่าเช่าปัจจุบัน"
+              : "ราคา"}
+        </p>
         <p className="text-lg font-bold text-slate-900" style={{ color: PRIMARY }}>
           ฿{item.price.toLocaleString()}
         </p>
+        {item.listingType === "sale" && (item.monthlyRent ?? 0) > 0 && (
+          <p className="mt-1 text-sm text-slate-500">
+            ค่าเช่าปัจจุบัน ฿{item.monthlyRent!.toLocaleString()}/เดือน
+          </p>
+        )}
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600">
           <span>{item.type}</span>
           {item.saleWithTenant && <span>มีผู้เช่าอยู่</span>}
@@ -80,7 +94,7 @@ function RecommendedAssetCard({ item }: { item: RecommendedAsset }) {
         <p className="mt-2 line-clamp-2 text-sm font-medium text-slate-900">
           {item.name}
         </p>
-        <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">
+        <p className="mt-auto pt-0.5 line-clamp-1 text-xs text-slate-500">
           {item.address}
         </p>
       </div>
@@ -240,15 +254,15 @@ export function RecommendedAssetsSection() {
         )}
 
         {loading && (
-          <div className="mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-5">
-            {[1, 2, 3, 4, 5].map((i) => (
+          <div className="mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
+            {[1, 2, 3, 4].map((i) => (
               <CardSkeleton key={i} />
             ))}
           </div>
         )}
 
         {!loading && !error && items.length > 0 && (
-          <div className="mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-5">
+          <div className="mt-6 flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:overflow-visible lg:grid-cols-4">
             {items.map((item) => (
               <RecommendedAssetCard key={item.id} item={item} />
             ))}

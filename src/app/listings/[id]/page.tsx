@@ -25,6 +25,8 @@ type ListingData = {
   name: string;
   type: string;
   price: number;
+  salePrice?: number;
+  monthlyRent?: number;
   address: string;
   description?: string;
   bedrooms?: string;
@@ -32,6 +34,7 @@ type ListingData = {
   squareMeters?: string;
   amenities?: string[];
   listingType?: string;
+  saleWithTenant?: boolean;
   imageUrls?: string[];
   agentName?: string;
   agentLineAccountId?: string;
@@ -221,7 +224,13 @@ export default function ListingDetailPage() {
             {/* Price + listed date */}
             <div className="mt-2 flex flex-wrap items-baseline gap-3">
               <p className="text-sm font-medium text-slate-500">
-                {listing.listingType === "sale" ? "ราคาขาย" : "ราคาเช่า"}
+                {listing.listingType === "sale" && listing.salePrice
+                  ? "ราคาขาย"
+                  : listing.saleWithTenant && listing.monthlyRent
+                    ? "ค่าเช่าปัจจุบัน"
+                    : listing.listingType === "sale"
+                      ? "ราคา"
+                      : "ราคาเช่า"}
               </p>
               <p className="text-2xl font-bold text-slate-900" style={{ color: PRIMARY }}>
                 ฿{listing.price.toLocaleString()}
@@ -229,6 +238,11 @@ export default function ListingDetailPage() {
                   <span className="text-base font-normal text-slate-500">/ เดือน</span>
                 )}
               </p>
+              {listing.listingType === "sale" && (listing.monthlyRent ?? 0) > 0 && (
+                <p className="text-sm text-slate-500">
+                  ค่าเช่าปัจจุบัน ฿{listing.monthlyRent!.toLocaleString()}/เดือน
+                </p>
+              )}
               {listedStr && (
                 <p className="text-sm text-slate-500">ลงประกาศเมื่อ {listedStr}</p>
               )}

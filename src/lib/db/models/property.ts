@@ -12,6 +12,8 @@ export interface IProperty {
   type: PropertyType;
   status: PropertyStatus;
   price: number;
+  salePrice?: number;
+  monthlyRent?: number;
   address: string;
   imageKeys: string[];
   listingType?: string;
@@ -50,6 +52,8 @@ export const PropertySchema = new mongoose.Schema<IProperty>(
     type: { type: String, required: true, enum: PROPERTY_TYPES },
     status: { type: String, required: true, enum: STATUSES },
     price: { type: Number, required: true },
+    salePrice: Number,
+    monthlyRent: Number,
     address: { type: String, required: true },
     imageKeys: { type: [String], default: [] },
     listingType: String,

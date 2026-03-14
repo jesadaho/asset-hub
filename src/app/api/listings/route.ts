@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectAssetAceDB } from "@/lib/db/mongodb";
 import { getPropertyModel } from "@/lib/db/models/property";
+import {
+  getInferredMonthlyRent,
+  getInferredSalePrice,
+  getPrimaryDisplayPrice,
+} from "@/lib/property-pricing";
 import { getPresignedGetUrl } from "@/lib/s3";
 
 const DEFAULT_LIMIT = 12;
@@ -109,6 +114,9 @@ export async function GET(request: NextRequest) {
           name: string;
           type: string;
           price: number;
+          salePrice?: number;
+          monthlyRent?: number;
+          saleWithTenant?: boolean;
           address: string;
           listingType?: string;
           createdAt: Date;
@@ -117,9 +125,12 @@ export async function GET(request: NextRequest) {
           id: d._id.toString(),
           name: d.name,
           type: d.type,
-          price: d.price,
+          price: getPrimaryDisplayPrice(d),
+          salePrice: getInferredSalePrice(d),
+          monthlyRent: getInferredMonthlyRent(d),
           address: d.address,
           listingType: d.listingType,
+          saleWithTenant: d.saleWithTenant ?? false,
           imageUrl: imageUrls[0] ?? null,
         };
       })

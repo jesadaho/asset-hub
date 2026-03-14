@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectAssetAceDB } from "@/lib/db/mongodb";
 import { getPropertyModel } from "@/lib/db/models/property";
+import {
+  getInferredMonthlyRent,
+  getInferredSalePrice,
+  getPrimaryDisplayPrice,
+} from "@/lib/property-pricing";
 import { getPresignedGetUrl } from "@/lib/s3";
 
 export async function GET(
@@ -17,13 +22,14 @@ export async function GET(
     const assetAceConnection = await connectAssetAceDB();
     const Property = getPropertyModel(assetAceConnection);
     const doc = await Property.findOne({ _id: id }).lean();
-    const publicListing = (doc as { publicListing?: boolean }).publicListing;
     const status = (doc as { status?: string }).status;
     const listingType = (doc as { listingType?: string }).listingType;
     const saleWithTenant = (doc as { saleWithTenant?: boolean }).saleWithTenant;
-    const isPublicSaleWithTenant =
+    const publicListing = (doc as { publicListing?: boolean }).publicListing;
+    const isVisibleSaleWithTenant =
       listingType === "sale" && saleWithTenant === true;
-    if (!doc || !publicListing || (status !== "Available" && !isPublicSaleWithTenant)) {
+    const isVisiblePublicListing = publicListing && status === "Available";
+    if (!doc || (!isVisiblePublicListing && !isVisibleSaleWithTenant)) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
 
@@ -39,7 +45,27 @@ export async function GET(
       id: (doc as { _id: mongoose.Types.ObjectId })._id.toString(),
       name: (doc as { name: string }).name,
       type: (doc as { type: string }).type,
-      price: (doc as { price: number }).price,
+      price: getPrimaryDisplayPrice(doc as {
+        listingType?: string;
+        saleWithTenant?: boolean;
+        price?: number;
+        salePrice?: number;
+        monthlyRent?: number;
+      }),
+      salePrice: getInferredSalePrice(doc as {
+        listingType?: string;
+        saleWithTenant?: boolean;
+        price?: number;
+        salePrice?: number;
+        monthlyRent?: number;
+      }),
+      monthlyRent: getInferredMonthlyRent(doc as {
+        listingType?: string;
+        saleWithTenant?: boolean;
+        price?: number;
+        salePrice?: number;
+        monthlyRent?: number;
+      }),
       address: (doc as { address: string }).address,
       description: (doc as { description?: string }).description,
       bedrooms: (doc as { bedrooms?: string }).bedrooms,

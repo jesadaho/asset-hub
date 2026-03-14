@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 import { connectAssetAceDB } from "@/lib/db/mongodb";
 import { getPropertyModel } from "@/lib/db/models/property";
 import type { IProperty } from "@/lib/db/models/property";
+import {
+  getInferredMonthlyRent,
+  getInferredSalePrice,
+  getPrimaryDisplayPrice,
+} from "@/lib/property-pricing";
 import { getPresignedGetUrl } from "@/lib/s3";
 
 const LIMIT = 5;
@@ -13,9 +18,11 @@ export async function GET() {
     const Property = getPropertyModel(assetAceConnection);
 
     const docs = await Property.find({
-      publicListing: true,
       listingType: "sale",
-      $or: [{ status: "Available" }, { saleWithTenant: true }],
+      $or: [
+        { publicListing: true, status: "Available" },
+        { saleWithTenant: true },
+      ],
     })
       .sort({ createdAt: -1, _id: -1 })
       .limit(LIMIT)
@@ -35,7 +42,9 @@ export async function GET() {
           id: d._id.toString(),
           name: d.name,
           type: d.type,
-          price: d.price,
+          price: getPrimaryDisplayPrice(d),
+          salePrice: getInferredSalePrice(d),
+          monthlyRent: getInferredMonthlyRent(d),
           address: d.address,
           listingType: d.listingType,
           saleWithTenant: d.saleWithTenant ?? false,

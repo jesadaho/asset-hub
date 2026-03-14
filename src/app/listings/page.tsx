@@ -16,8 +16,11 @@ type ListingItem = {
   name: string;
   type: string;
   price: number;
+  salePrice?: number;
+  monthlyRent?: number;
   address: string;
   listingType?: string;
+  saleWithTenant?: boolean;
   imageUrl: string | null;
 };
 
@@ -152,14 +155,26 @@ function ListingsPageContent() {
                   </div>
                   <div className="p-4">
                     <p className="font-semibold text-slate-900 line-clamp-1">{item.name}</p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">
+                      {item.listingType === "sale" && item.salePrice
+                        ? "ราคาขาย"
+                        : item.saleWithTenant && item.monthlyRent
+                          ? "ค่าเช่าปัจจุบัน"
+                          : item.listingType === "sale"
+                            ? "ราคา"
+                            : "ค่าเช่า"}
+                    </p>
                     <p className="mt-1 text-lg font-bold" style={{ color: PRIMARY }}>
                       ฿{item.price.toLocaleString()}
-                      {item.listingType === "sale" ? (
-                        <span className="text-sm font-normal text-slate-500"></span>
-                      ) : (
+                      {item.listingType === "sale" ? null : (
                         <span className="text-sm font-normal text-slate-500">/ เดือน</span>
                       )}
                     </p>
+                    {item.listingType === "sale" && (item.monthlyRent ?? 0) > 0 && (
+                      <p className="mt-1 text-sm text-slate-500">
+                        ค่าเช่าปัจจุบัน ฿{item.monthlyRent!.toLocaleString()}/เดือน
+                      </p>
+                    )}
                     <p className="mt-1 text-sm text-slate-600 line-clamp-2">{item.address}</p>
                     <span className="mt-2 inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
                       {item.type}
