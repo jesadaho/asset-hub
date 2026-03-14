@@ -43,6 +43,27 @@ export async function GET(
       if (url) imageUrls.push(url);
     }
 
+    const ownerId = (doc as { ownerId?: string }).ownerId;
+    let ownerName: string | undefined;
+    let ownerLineAccountId: string | undefined;
+    if (ownerId) {
+      const owner = await assetAceConnection.collection("users").findOne(
+        { lineUserId: ownerId },
+        { projection: { name: 1, lineId: 1 } }
+      );
+      ownerName =
+        typeof owner?.name === "string" && owner.name.trim()
+          ? owner.name.trim()
+          : undefined;
+      ownerLineAccountId =
+        typeof owner?.lineId === "string" && owner.lineId.trim()
+          ? owner.lineId.trim().replace(/^@/, "")
+          : undefined;
+      if (ownerLineAccountId && /^U[0-9a-f]{32,}$/i.test(ownerLineAccountId)) {
+        ownerLineAccountId = undefined;
+      }
+    }
+
     const createdAt = (doc as { createdAt?: Date }).createdAt;
     return NextResponse.json({
       id: (doc as { _id: mongoose.Types.ObjectId })._id.toString(),
@@ -80,6 +101,8 @@ export async function GET(
       imageUrls,
       agentName: (doc as { agentName?: string }).agentName,
       agentLineAccountId: (doc as { agentLineAccountId?: string }).agentLineAccountId,
+      ownerName,
+      ownerLineAccountId,
       listedAt: createdAt ? new Date(createdAt).toISOString() : undefined,
     });
   } catch (err) {

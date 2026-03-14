@@ -152,7 +152,7 @@ export function RecommendedAssetsSection() {
           )}
         </div>
         <p className="mt-2 text-sm text-slate-500">
-          คัดรายการขายที่น่าสนใจจาก Asset Ace รวมถึงห้องขายพร้อมผู้เช่า
+          รายการประกาศขายและปล่อยเช่าตรงจากเจ้าของห้อง
         </p>
 
         {error && (

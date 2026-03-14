@@ -15,10 +15,25 @@ import {
   Phone,
   Mail,
   MapPin,
+  MessageCircle,
 } from "lucide-react";
 import { Header } from "@/components/Header";
 
 const PRIMARY = "#068e7b";
+const AMENITY_LABELS: Record<string, string> = {
+  balcony: "ระเบียง",
+  basement: "ห้องใต้ดิน",
+  "bike-parking": "ที่จอดจักรยาน",
+  "cable-tv": "เคเบิลทีวี",
+  pool: "สระว่ายน้ำ",
+  gym: "ฟิตเนส",
+  parking: "ที่จอดรถ",
+  garden: "สวน",
+  security: "รักษาความปลอดภัย",
+  elevator: "ลิฟต์",
+  wifi: "WiFi",
+  "air-conditioning": "เครื่องปรับอากาศ",
+};
 
 type ListingData = {
   id: string;
@@ -38,6 +53,8 @@ type ListingData = {
   imageUrls?: string[];
   agentName?: string;
   agentLineAccountId?: string;
+  ownerName?: string;
+  ownerLineAccountId?: string;
   listedAt?: string;
 };
 
@@ -50,6 +67,10 @@ function formatListedDate(iso?: string): string {
     month: "short",
     year: "numeric",
   });
+}
+
+function formatAmenityLabel(value: string): string {
+  return AMENITY_LABELS[value] ?? value;
 }
 
 export default function ListingDetailPage() {
@@ -130,6 +151,14 @@ export default function ListingDetailPage() {
   const lineHref = hasLineAgent
     ? `https://line.me/ti/p/~${listing.agentLineAccountId!.trim().replace(/^@/, "")}`
     : "https://assethub.in.th";
+  const hasLineOwner = !!(
+    listing.ownerLineAccountId &&
+    listing.ownerLineAccountId.trim() &&
+    !/^U[0-9a-f]{32,}$/i.test(listing.ownerLineAccountId.trim())
+  );
+  const ownerLineHref = hasLineOwner
+    ? `https://line.me/ti/p/~${listing.ownerLineAccountId!.trim().replace(/^@/, "")}`
+    : null;
   const agentLabel = listing.agentName?.trim() || "AssetHub";
   const listedStr = formatListedDate(listing.listedAt);
   const descriptionShort =
@@ -274,18 +303,6 @@ export default function ListingDetailPage() {
               )}
             </div>
 
-            {/* Key features (amenities as bullets) */}
-            {listing.amenities && listing.amenities.length > 0 && (
-              <div className="mt-8 border-t border-slate-200 pt-6">
-                <h2 className="text-lg font-semibold text-slate-900">จุดเด่น</h2>
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-slate-600">
-                  {listing.amenities.map((a) => (
-                    <li key={a}>{a}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             {/* Description */}
             {(listing.description ?? "").length > 0 && (
               <div className="mt-8 border-t border-slate-200 pt-6">
@@ -303,6 +320,23 @@ export default function ListingDetailPage() {
                     อ่านเพิ่มเติม
                   </button>
                 )}
+              </div>
+            )}
+
+            {/* Amenities */}
+            {listing.amenities && listing.amenities.length > 0 && (
+              <div className="mt-8 border-t border-slate-200 pt-6">
+                <h2 className="text-lg font-semibold text-slate-900">สิ่งอำนวยความสะดวก</h2>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {listing.amenities.map((a) => (
+                    <span
+                      key={a}
+                      className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700"
+                    >
+                      {formatAmenityLabel(a)}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -341,6 +375,20 @@ export default function ListingDetailPage() {
               </Link>
 
               <div className="mt-6 flex flex-col gap-3">
+                {ownerLineHref && (
+                  <a
+                    href={ownerLineHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
+                    style={{ backgroundColor: "#06C755" }}
+                  >
+                    <MessageCircle className="h-4 w-4" aria-hidden />
+                    {listing.ownerName?.trim()
+                      ? `แชทคุยกับเจ้าของห้อง (${listing.ownerName.trim()})`
+                      : "แชทคุยกับเจ้าของห้อง"}
+                  </a>
+                )}
                 <a
                   href={lineHref}
                   target="_blank"
