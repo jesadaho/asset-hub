@@ -101,6 +101,92 @@ function LineIcon({ className = "h-4 w-4" }: { className?: string }) {
   );
 }
 
+/** Skeleton for listing detail page (gallery + content + sidebar) */
+function ListingDetailSkeleton() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Header />
+
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-6 h-5 w-32 animate-pulse rounded bg-slate-200" />
+
+        <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+          <article className="min-w-0">
+            {/* Gallery skeleton */}
+            <div className="flex gap-2">
+              <div className="relative flex-1 aspect-[3/2] min-h-[240px] overflow-hidden rounded-xl bg-slate-200 animate-pulse" />
+              <div className="flex w-20 flex-shrink-0 flex-col gap-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-slate-200 animate-pulse" />
+                ))}
+              </div>
+            </div>
+
+            {/* Title + actions */}
+            <div className="mt-6 flex flex-wrap items-start justify-between gap-2">
+              <div className="h-8 w-3/4 max-w-md animate-pulse rounded bg-slate-200" />
+              <div className="flex gap-2">
+                <div className="h-10 w-10 animate-pulse rounded-lg bg-slate-200" />
+                <div className="h-10 w-10 animate-pulse rounded-lg bg-slate-200" />
+              </div>
+            </div>
+
+            {/* Price block */}
+            <div className="mt-2 flex flex-wrap items-baseline gap-3">
+              <div className="h-4 w-20 animate-pulse rounded bg-slate-200" />
+              <div className="h-8 w-32 animate-pulse rounded bg-slate-200" />
+              <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+            </div>
+
+            {/* Key details grid */}
+            <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="h-5 w-5 shrink-0 animate-pulse rounded bg-slate-200" />
+                  <div className="h-4 w-20 animate-pulse rounded bg-slate-200" />
+                </div>
+              ))}
+            </div>
+
+            {/* Description block */}
+            <div className="mt-8 border-t border-slate-200 pt-6">
+              <div className="h-6 w-24 animate-pulse rounded bg-slate-200" />
+              <div className="mt-3 space-y-2">
+                <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
+                <div className="h-4 w-full animate-pulse rounded bg-slate-200" />
+                <div className="h-4 w-2/3 animate-pulse rounded bg-slate-200" />
+              </div>
+            </div>
+
+            {/* Location block */}
+            <div className="mt-8 border-t border-slate-200 pt-6">
+              <div className="h-6 w-20 animate-pulse rounded bg-slate-200" />
+              <div className="mt-2 h-4 w-64 animate-pulse rounded bg-slate-200" />
+              <div className="mt-3 h-9 w-36 animate-pulse rounded bg-slate-200" />
+            </div>
+          </article>
+
+          {/* Sidebar skeleton */}
+          <aside className="lg:sticky lg:top-24 lg:self-start">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="h-3 w-16 animate-pulse rounded bg-slate-200" />
+              <div className="mt-2 h-6 w-28 animate-pulse rounded bg-slate-200" />
+              <div className="mt-1 h-4 w-40 animate-pulse rounded bg-slate-200" />
+              <div className="mt-2 h-4 w-36 animate-pulse rounded bg-slate-200" />
+
+              <div className="mt-6 flex flex-col gap-3">
+                <div className="h-12 w-full animate-pulse rounded-lg bg-slate-200" />
+                <div className="h-12 w-full animate-pulse rounded-lg bg-slate-200" />
+                <div className="h-12 w-full animate-pulse rounded-lg bg-slate-200" />
+              </div>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export default function ListingDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -146,11 +232,7 @@ export default function ListingDetailPage() {
   }, [id]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <p className="text-slate-500 text-sm">กำลังโหลด...</p>
-      </div>
-    );
+    return <ListingDetailSkeleton />;
   }
 
   if (notFound || !listing) {
