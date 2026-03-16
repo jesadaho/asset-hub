@@ -23,6 +23,7 @@ export async function GET() {
       $or: [
         { publicListing: true, status: "Available" },
         { saleWithTenant: true, status: { $nin: ["Paused", "Archived"] } },
+        { status: "Available" },
       ],
     })
       .sort({ createdAt: -1, _id: -1 })
