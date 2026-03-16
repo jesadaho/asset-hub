@@ -54,9 +54,9 @@ function RecommendedAssetCard({ item }: { item: RecommendedAsset }) {
         )}
         <div className="absolute left-2 top-2 flex flex-wrap gap-1.5">
           <span className="rounded-md bg-white/95 px-2 py-1 text-xs font-medium text-slate-700 shadow">
-            ขาย
+            {item.listingType === "sale" ? "ขาย" : "เช่า"}
           </span>
-          {item.saleWithTenant && (
+          {item.listingType === "sale" && item.saleWithTenant && (
             <span className="rounded-md bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800 shadow">
               ขายพร้อมผู้เช่า
             </span>
@@ -85,9 +85,6 @@ function RecommendedAssetCard({ item }: { item: RecommendedAsset }) {
         </div>
         <p className="mt-2 line-clamp-2 text-sm font-medium text-slate-900">
           {item.name}
-        </p>
-        <p className="mt-auto pt-0.5 line-clamp-1 text-xs text-slate-500">
-          {item.address}
         </p>
       </div>
     </Link>

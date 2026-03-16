@@ -18,7 +18,6 @@ export async function GET() {
     const Property = getPropertyModel(assetAceConnection);
 
     const docs = await Property.find({
-      listingType: "sale",
       showOnAssetHub: { $ne: false },
       $or: [
         { publicListing: true, status: "Available" },

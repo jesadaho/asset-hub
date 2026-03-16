@@ -40,10 +40,14 @@ export async function GET(request: NextRequest) {
     const assetAceConnection = await connectAssetAceDB();
     const Property = getPropertyModel(assetAceConnection);
 
+    // Use same visibility logic as recommended-assets so sale listings that appear there also appear here
     const filter: Record<string, unknown> = {
-      publicListing: true,
-      status: "Available",
       showOnAssetHub: { $ne: false },
+      $or: [
+        { publicListing: true, status: "Available" },
+        { saleWithTenant: true, status: { $nin: ["Paused", "Archived"] } },
+        { status: "Available" },
+      ],
     };
 
     if (listingType === "sale") {
@@ -132,6 +136,8 @@ export async function GET(request: NextRequest) {
           saleWithTenant?: boolean;
           address: string;
           listingType?: string;
+          bedrooms?: string;
+          bathrooms?: string;
           createdAt: Date;
         };
         return {
@@ -144,6 +150,9 @@ export async function GET(request: NextRequest) {
           address: d.address,
           listingType: d.listingType,
           saleWithTenant: d.saleWithTenant ?? false,
+          bedrooms: d.bedrooms,
+          bathrooms: d.bathrooms,
+          createdAt: d.createdAt,
           imageUrl: imageUrls[0] ?? null,
         };
       })

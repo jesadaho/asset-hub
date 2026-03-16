@@ -56,6 +56,7 @@ export function SearchFilterBar({ embeddedInHero = false }: { embeddedInHero?: b
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isListingsPage = pathname.startsWith("/listings");
   const [locationInput, setLocationInput] = useState(searchParams.get("location") ?? "");
   const [priceOpen, setPriceOpen] = useState(false);
   const [bedsOpen, setBedsOpen] = useState(false);
@@ -64,10 +65,20 @@ export function SearchFilterBar({ embeddedInHero = false }: { embeddedInHero?: b
   const bedsRef = useRef<HTMLDivElement>(null);
   const propertyTypeRef = useRef<HTMLDivElement>(null);
 
-  const listingType = searchParams.get("listing_type") ?? "SALE";
+  const rawLt = isListingsPage
+    ? searchParams.get("listingType") ?? searchParams.get("listing_type")
+    : searchParams.get("listing_type");
+  const listingType =
+    (rawLt ?? (isListingsPage ? "rent" : "SALE")).toString().toUpperCase() === "RENT" ? "RENT" : "SALE";
   const propertyType = searchParams.get("property_type") ?? "RESIDENTIAL";
-  const minPrice = searchParams.get("min_price") ?? "";
-  const maxPrice = searchParams.get("max_price") ?? "";
+  const minPrice =
+    isListingsPage
+      ? searchParams.get("minPrice") ?? searchParams.get("min_price") ?? ""
+      : searchParams.get("min_price") ?? "";
+  const maxPrice =
+    isListingsPage
+      ? searchParams.get("maxPrice") ?? searchParams.get("max_price") ?? ""
+      : searchParams.get("max_price") ?? "";
   const bedrooms = searchParams.get("bedrooms") ?? "";
   const residentialPropertyType = searchParams.get("residential_property_type") ?? "ALL";
 
@@ -77,15 +88,37 @@ export function SearchFilterBar({ embeddedInHero = false }: { embeddedInHero?: b
 
   const updateParams = useCallback(
     (updates: Record<string, string>) => {
+      const applied: Record<string, string> = { ...updates };
+      if (isListingsPage) {
+        if ("listing_type" in applied) {
+          const v = applied.listing_type;
+          delete applied.listing_type;
+          applied.listingType = v?.toLowerCase() === "rent" ? "rent" : "sale";
+        }
+        if ("min_price" in applied) {
+          applied.minPrice = applied.min_price;
+          delete applied.min_price;
+        }
+        if ("max_price" in applied) {
+          applied.maxPrice = applied.max_price;
+          delete applied.max_price;
+        }
+      }
       const params = new URLSearchParams(searchParams.toString());
-      for (const [key, value] of Object.entries(updates)) {
+      for (const [key, value] of Object.entries(applied)) {
         if (value === "" || value == null) params.delete(key);
         else params.set(key, value);
+      }
+      if (isListingsPage) {
+        params.delete("page");
+        params.delete("listing_type");
+        params.delete("min_price");
+        params.delete("max_price");
       }
       const qs = params.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname);
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams, isListingsPage]
   );
 
   useEffect(() => {
@@ -190,7 +223,8 @@ export function SearchFilterBar({ embeddedInHero = false }: { embeddedInHero?: b
                   if (locationInput.trim()) p.set("location", locationInput.trim());
                   if (minPrice) p.set("minPrice", minPrice);
                   if (maxPrice) p.set("maxPrice", maxPrice);
-                  router.push(`/listings?${p.toString()}`);
+                  if (isListingsPage) router.replace(`${pathname}?${p.toString()}`);
+                  else router.push(`/listings?${p.toString()}`);
                 }}
                 className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-md transition hover:opacity-95"
                 style={{ backgroundColor: PRIMARY }}
