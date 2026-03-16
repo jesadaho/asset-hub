@@ -46,8 +46,20 @@ export async function GET(request: NextRequest) {
       showOnAssetHub: { $ne: false },
     };
 
-    if (listingType === "sale" || listingType === "rent") {
-      filter.listingType = listingType;
+    if (listingType === "sale") {
+      filter.listingType = "sale";
+    } else if (listingType === "rent") {
+      // Include rent and any listing without type (treat as rent for visibility)
+      filter.$and = [
+        {
+          $or: [
+            { listingType: "rent" },
+            { listingType: null },
+            { listingType: { $exists: false } },
+            { listingType: "" },
+          ],
+        },
+      ];
     }
 
     if (location) {
