@@ -26,13 +26,15 @@ export async function GET(
     const listingType = (doc as { listingType?: string }).listingType;
     const saleWithTenant = (doc as { saleWithTenant?: boolean }).saleWithTenant;
     const publicListing = (doc as { publicListing?: boolean }).publicListing;
+    const showOnAssetHub = (doc as { showOnAssetHub?: boolean }).showOnAssetHub;
     const isVisibleSaleWithTenant =
       listingType === "sale" &&
       saleWithTenant === true &&
       status !== "Paused" &&
       status !== "Archived";
     const isVisiblePublicListing = publicListing && status === "Available";
-    if (!doc || (!isVisiblePublicListing && !isVisibleSaleWithTenant)) {
+    const showOnHub = showOnAssetHub !== false;
+    if (!doc || !showOnHub || (!isVisiblePublicListing && !isVisibleSaleWithTenant)) {
       return NextResponse.json({ message: "Not found" }, { status: 404 });
     }
 

@@ -41,6 +41,8 @@ export interface IProperty {
   reservedByName?: string;
   reservedByContact?: string;
   vacancyNotified30DayAt?: Date;
+  /** When true or unset, listing is shown on Asset Hub. Default true. */
+  showOnAssetHub?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -81,6 +83,7 @@ export const PropertySchema = new mongoose.Schema<IProperty>(
     reservedByName: String,
     reservedByContact: String,
     vacancyNotified30DayAt: Date,
+    showOnAssetHub: Boolean,
   },
   { timestamps: true }
 );

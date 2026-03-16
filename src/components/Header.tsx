@@ -332,7 +332,7 @@ export function Header() {
             <LanguageSwitcher />
           </div>
           <Link
-            href="/sign-in"
+            href="/post"
             className="inline-flex items-center rounded-lg px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
             style={{ backgroundColor: PRIMARY }}
           >

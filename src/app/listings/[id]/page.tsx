@@ -15,7 +15,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  MessageCircle,
 } from "lucide-react";
 import { Header } from "@/components/Header";
 
@@ -71,6 +70,35 @@ function formatListedDate(iso?: string): string {
 
 function formatAmenityLabel(value: string): string {
   return AMENITY_LABELS[value] ?? value;
+}
+
+function LineIcon({ className = "h-4 w-4" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M12 3.25C6.89 3.25 2.75 6.67 2.75 10.88c0 3.77 3.27 6.92 7.68 7.52l-.42 2.5a.5.5 0 0 0 .73.52l2.85-1.5c.13-.07.28-.1.42-.1 4.66 0 8.99-3.33 8.99-7.94 0-4.21-4.14-8.63-10-8.63Z"
+        fill="currentColor"
+      />
+      <path
+        d="M8.2 13.9h1.76a.6.6 0 1 0 0-1.2H8.8V9.87a.6.6 0 0 0-1.2 0v3.43c0 .33.27.6.6.6Zm6.18 0a.6.6 0 0 0 .6-.6v-.87h1.19a.6.6 0 1 0 0-1.2h-1.2v-.76h1.2a.6.6 0 1 0 0-1.2h-1.8a.6.6 0 0 0-.6.6v3.43c0 .33.27.6.6.6Zm-2.74-4.63a.6.6 0 0 0-.6.6v1.77l-1.36-2.1a.6.6 0 0 0-1.1.32v3.44a.6.6 0 0 0 1.2 0v-1.77l1.36 2.09a.6.6 0 0 0 1.1-.32V9.87a.6.6 0 0 0-.6-.6Z"
+        fill="#06C755"
+      />
+      <path
+        d="M12.12 9.27a.6.6 0 0 0-.6.6v3.43a.6.6 0 1 0 1.2 0V9.87a.6.6 0 0 0-.6-.6Z"
+        fill="#06C755"
+      />
+      <path
+        d="M18.03 10.47a.6.6 0 1 0 0-1.2h-1.8a.6.6 0 0 0-.6.6v3.43c0 .33.27.6.6.6h1.8a.6.6 0 1 0 0-1.2h-1.2v-.76h1.2a.6.6 0 1 0 0-1.2h-1.2v-.27h1.2Z"
+        fill="#06C755"
+      />
+    </svg>
+  );
 }
 
 export default function ListingDetailPage() {
@@ -383,7 +411,7 @@ export default function ListingDetailPage() {
                     className="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
                     style={{ backgroundColor: "#06C755" }}
                   >
-                    <MessageCircle className="h-4 w-4" aria-hidden />
+                    <LineIcon className="h-5 w-5" />
                     {listing.ownerName?.trim()
                       ? `แชทคุยกับเจ้าของห้อง (${listing.ownerName.trim()})`
                       : "แชทคุยกับเจ้าของห้อง"}

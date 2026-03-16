@@ -43,6 +43,7 @@ export async function GET(request: NextRequest) {
     const filter: Record<string, unknown> = {
       publicListing: true,
       status: "Available",
+      showOnAssetHub: { $ne: false },
     };
 
     if (listingType === "sale" || listingType === "rent") {

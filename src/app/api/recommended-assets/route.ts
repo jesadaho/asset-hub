@@ -19,6 +19,7 @@ export async function GET() {
 
     const docs = await Property.find({
       listingType: "sale",
+      showOnAssetHub: { $ne: false },
       $or: [
         { publicListing: true, status: "Available" },
         { saleWithTenant: true, status: { $nin: ["Paused", "Archived"] } },

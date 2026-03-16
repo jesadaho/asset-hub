@@ -145,20 +145,18 @@ export function Footer() {
               <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-900">
                 สำหรับมืออาชีพ
               </h3>
-              <a
-                href="https://assethub.in.th"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/post"
                 className="mt-3 flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90"
                 style={{ backgroundColor: PRIMARY }}
               >
                 AssetHub สำหรับเจ้าของ
                 <ExternalLink className="h-4 w-4" aria-hidden />
-              </a>
+              </Link>
               <nav className="mt-4 flex flex-col" aria-label="มืออาชีพ">
-                <a href="https://assethub.in.th" target="_blank" rel="noopener noreferrer" className={footerLinkClass}>
+                <Link href="/post" className={footerLinkClass}>
                   ลงประกาศกับเรา
-                </a>
+                </Link>
                 <a href="https://assethub.in.th" target="_blank" rel="noopener noreferrer" className={footerLinkClass}>
                   สำหรับเอเจนต์
                 </a>
