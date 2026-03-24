@@ -32,6 +32,11 @@ export interface IProperty {
   agentInviteSentAt?: Date;
   invitedAgentName?: string;
   lineGroup?: string;
+  /** LINE Messaging API group id (e.g. C...) — shared with asset-ace Property collection */
+  lineGroupId?: string;
+  rentDueDayOfMonth?: number;
+  lastRentPaidAt?: Date;
+  rentOverdueNotifiedForMonth?: string;
   contractStartDate?: Date;
   openForAgent?: boolean;
   publicListing?: boolean;
@@ -74,6 +79,10 @@ export const PropertySchema = new mongoose.Schema<IProperty>(
     agentInviteSentAt: Date,
     invitedAgentName: String,
     lineGroup: String,
+    lineGroupId: String,
+    rentDueDayOfMonth: Number,
+    lastRentPaidAt: Date,
+    rentOverdueNotifiedForMonth: String,
     contractStartDate: Date,
     openForAgent: Boolean,
     publicListing: Boolean,
@@ -89,6 +98,7 @@ export const PropertySchema = new mongoose.Schema<IProperty>(
 );
 
 PropertySchema.index({ ownerId: 1 });
+PropertySchema.index({ lineGroupId: 1 }, { unique: true, sparse: true });
 
 export function getPropertyModel(connection?: mongoose.Connection) {
   if (connection) {
