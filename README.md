@@ -1,10 +1,10 @@
 # Asset Hub Property Listing Web
 
-Next.js property listing site that shares the same MongoDB and S3 backend as the Asset Ace app. Primary color: `#015c50`.
+Next.js property listing site that shares the same MongoDB and S3 backend as the Nicha by AssetHub app. Primary color: `#015c50`.
 
 ## Setup
 
-1. Copy env example and fill in values (same as Asset Ace):
+1. Copy env example and fill in values (same as Nicha by AssetHub):
 
    ```bash
    cp .env.local.example .env.local

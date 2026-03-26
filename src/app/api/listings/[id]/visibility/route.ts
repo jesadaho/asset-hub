@@ -5,7 +5,7 @@ import { getPropertyModel } from "@/lib/db/models/property";
 
 /**
  * GET /api/listings/[id]/visibility
- * Returns visibility-related fields for a listing (from Asset Ace DB) so we can see why it does or doesn't show on Asset Hub.
+ * Returns visibility-related fields for a listing (from Nicha by AssetHub DB) so we can see why it does or doesn't show on Asset Hub.
  * Only available when NODE_ENV !== "production".
  */
 export async function GET(
@@ -26,7 +26,7 @@ export async function GET(
     const doc = await Property.findOne({ _id: id }).lean();
     if (!doc) {
       return NextResponse.json(
-        { found: false, message: "Property not found in Asset Ace DB" },
+        { found: false, message: "Property not found in Nicha by AssetHub DB" },
         { status: 200 }
       );
     }

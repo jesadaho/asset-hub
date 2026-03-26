@@ -186,7 +186,7 @@ export default function ListingsPageClient() {
     router.push(`${pathname}?${next.toString()}`);
   };
 
-  /** รายการรวม: ประกาศจาก Asset Ace ขึ้นก่อน เสมอ ตามด้วย DDproperty (เฉพาะหน้า 1) */
+  /** รายการรวม: ประกาศจาก Nicha by AssetHub ขึ้นก่อน เสมอ ตามด้วย DDproperty (เฉพาะหน้า 1) */
   type ListingRow = { source: "own"; item: ListingItem } | { source: "dd"; item: DDPropertyItem };
   const isRent = listingType === "rent";
   const isSale = listingType === "sale";

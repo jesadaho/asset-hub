@@ -94,7 +94,7 @@ export default function PostLandingPage() {
                   </p>
                   <p className="mt-1 text-xs text-slate-600">
                     ผู้สนใจสามารถทักแชทหาคุณผ่าน LINE
-                    ทั้งจาก Asset Ace และ Asset Hub
+                    ทั้งจาก Nicha by AssetHub และ Asset Hub
                   </p>
                 </div>
                 <div className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-slate-200">
@@ -102,7 +102,7 @@ export default function PostLandingPage() {
                     จัดการทรัพย์ได้ในที่เดียว
                   </p>
                   <p className="mt-1 text-xs text-slate-600">
-                    ใช้ Asset Ace จัดการสถานะห้อง การเช่า
+                    ใช้ Nicha by AssetHub จัดการสถานะห้อง การเช่า
                     และการติดต่อเอเจนต์แบบเป็นระบบ
                   </p>
                 </div>
@@ -168,7 +168,7 @@ export default function PostLandingPage() {
               </ol>
               <p className="mt-3 text-xs text-slate-500">
                 ระบบการจัดการประกาศและข้อมูลห้อง
-                จะทำงานผ่าน Asset Ace ซึ่งเชื่อมกับ LINE OA ของเราโดยตรง
+                จะทำงานผ่าน Nicha by AssetHub ซึ่งเชื่อมกับ LINE OA ของเราโดยตรง
               </p>
 
               <div className="mt-6 border-t border-slate-200 pt-5">
